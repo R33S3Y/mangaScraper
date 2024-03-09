@@ -10,47 +10,14 @@ export class MangaSearch {
 
 export class Manga {
     constructor() {
-        this.metaHandler = new MetaHandler();
-        this.requestHandler = new RequestHandler();
+        this.metahandler = new MetaHandler();
+        this.requesthandler = new RequestHandler();
 
-        this.metaInfo = {};
-        /**
-         * metaInfo is made to help find out where and how to take from infoSource 
-         * 
-         * eg: {link: {type: "rank", info: [["mangatoto-145319"]]},
-         *      authors: {type: "accumulativeMinusMatchs", info: null},
-         *      artists: {type: "accumulativeMinusMatchs", info: null},
-         *      genres: {type: "accumulativeMinusMatchs", info: null},
-         *      originalLanguage: {type: "rank", info: [["mangatoto-145319"]]},
-         *      availableLanguages: {type: "rank", info: [["mangatoto-145319"]]},
-         *      displayMethod: {type: "rank", info: [["mangatoto-145319"]]},
-         *      views: {type: "addition", info: null},
-         *      
-         *      ratings: {type: "mean", info: "totalReviews"},
-         *      totalReviews: {type: "addition", info: null},
-         *      
-         *      english: {
-         *                  coverImage: {type: "rank", info: [["mangatoto-145319"]]},
-         *                  coverImageExpire: {type: "sameSource", info: english.coverImage},
-         *                  title: {type: "rank", info: [["mangatoto-145319"]]},
-         *                  subtitle: {type: "rank", info: [["mangatoto-145319"]]},
-         *                  description: {type: "rank", info: [["mangatoto-145319"]]},
-         *                  status: {type: "rank", info: [["mangatoto-145319"]]},
-         *                  totalChapters: {type: "greater", info: null},
-         *                  chapterTitles: {type: "rank", info: [["mangatoto-145319"]]},
-         *                  chapterUploader: {type: "sameSource", info: "english.totalChapters"},
-         *                  chapterLengths: {type: "sameSource", info: "english.totalChapters"},
-         *                  chapterLinks: {type: "sameSource", info: "english.totalChapters"},
-         *                  chapterLinksExpire : {type: "sameSource", info: "english.totalChapters"},
-         *                  pictureLinks: {type: "sameSource", info: "english.totalChapters"},
-         *                  pictureLinksExpire : {type: "sameSource", info: "english.totalChapters"},      
-         *               }
-         *     }
-         */
+        this.sourceRank = []; 
         
         // INFO
         
-        this.infoSources = {};
+        this.infoSources = [];
         /** eg: [
          *       {source: "mangatoto",
          *        id: 0,
@@ -58,7 +25,7 @@ export class Manga {
          *        authors: [{name: "Hana tsukiyuki"}],
          *        artists: [{name: "Rika fujiwara"}],
          *        genres: ["Manga", "Josei(W)", etc],
-         *         originalLanguage: "japanese",
+         *        originalLanguage: "japanese",
          *        availableLanguages: ["english"],
          *        displayMethod: "",
          *        views: 840,
@@ -76,10 +43,10 @@ export class Manga {
          *                    totalChapters: 6,
          *                    chapterTitles: ["Volume 1 Chapter 1", "Volume 1 Chapter 2", etc],
          *                    chapterUploader: [{name: "Rika fujiwara"}],
-         *                    chapterLengths: [26, 24, etc], // How many pictures are in a chapter
+         *                    totalPictures: [26, 24, etc], // How many pictures are in a chapter
          *                    chapterLinks: ["https://mangatoto.com/chapter/2625924", "https://mangatoto.com/chapter/2644871", etc],
          *                    chapterLinksExpire : False
-         *                     pictureLinks: [
+         *                    pictureLinks: [
          *                                     ["https://xfs-s103.batcg.org/comic/7006/119/657ec22673fc47c1f41a6911/43642984_1080_1535_426892.webp?acc=MAXx2m-8AO2lHdrUEBEtqA&exp=1703890123", "https://xfs-hd03.batcg.org/comic/7006/119/657ec22673fc47c1f41a6911/43642983_1080_1535_394896.webp?acc=7-sQFqWcnh74ndYEV2i29w&exp=1703890123", etc],
          *                                     ["https://xfs-s105.batcg.org/comic/7006/5cb/658eb5fa32142277297e8bc5/44505463_1080_1535_293932.webp?acc=9vAjbokEV_EaOJ64N6xRUw&exp=1703890405", "https://xfs-s122.batcg.org/comic/7006/5cb/658eb5fa32142277297e8bc5/44505464_1080_1535_273214.webp?acc=f4MaX7vFrpoAOsASEm9NPA&exp=1703890405", etc], 
          *                                     etc
@@ -92,7 +59,7 @@ export class Manga {
     }
 
 
-    async request(items, snapBack = 3, maxParallelRequests = 2) {
+    async update(items, langauge = null, chapter = null, maxParallelRequests = 2) {
 
         // Check that items is vaild
         let standaloneOutput = false;
@@ -102,14 +69,14 @@ export class Manga {
                 return null;
             }
             standaloneOutput = true;
-            items = [items];this.infoSources
+            items = [items];
         }
         // Add check here to make sure that items[i] = vaild string (I dont know the full list now) ; )
-
         // for item in items:
         for (let item of items) {
+            
             let allItemInfo = [];
-            allItemInfo = this.metaHandler.getAllItems(item, this.infoSources);
+            allItemInfo = this.metahandler.getAllItems(item, langauge, chapter, this.infoSources);
 
             /**
              * If the following check has failed this means that there is none of that info locally and we need to do a network request
@@ -144,11 +111,11 @@ export class Manga {
                  * Although as you can see it intentionally avoided merging ranks to fill requests.
                  * This is intentional although I may add a flag/setting to merge.
                  */
-                let rawRequestOrder = this.metaInfo.request.info;
+                let rawRequestOrder = this.sourceRank;
                 let requestOrder = [];
                 for (let rank of rawRequestOrder) {
                     let requestItem = [];
-                    while(rank.length < 0){
+                    while(rank.length > 0){
                         if (requestItem.length == maxParallelRequests) {
                             requestOrder.push(requestItem);
                             requestItem = [];
@@ -157,23 +124,25 @@ export class Manga {
                     }
                     requestOrder.push(requestItem);
                 }
-                console.log(requestOrder);
-
-                /**
-                 * Network requests
-                 */
-                let dotIndex = item.indexOf('.');
-                let rawItem = dotIndex !== -1 ? item.substring(dotIndex + 1) : item;
-                let rawLangauge = dotIndex !== -1 ? item.substring(0, dotIndex) : item;
-
-                this.requestHandler.request(rawItem, rawLangauge, requestOrder[0][0], this.infoSources);
+                for (let requestGroup of requestOrder) {
+                    console.log(item);
+                    console.log()
+                    let parallelRequestsOut = this.requesthandler.parallelRequests(item, langauge, chapter, requestGroup, this.infoSources);
+                    if (parallelRequestsOut !== null) {
+                        this.infoSources = parallelRequestsOut;
+                    }
+                    if (this.metahandler.getAllItems(item, langauge, chapter, this.infoSources.length !== 0)) {
+                        break;
+                    }
+                }
             }
-
-            // decide which source is best and handle if there is none
-            let meta = this.metaInfo[item];
-            let bestItem = this.metaHandler.getBestItem(allItemInfo, meta, this.metaInfo, snapBack)
-
         }
+    }
+
+    get(item, langauge = null, chapter = null) {
+        let allItemInfo = this.metahandler.getAllItems(item, langauge, chapter, this.infoSources);
+
+        return allItemInfo;
     }
 }
 

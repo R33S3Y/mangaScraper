@@ -292,7 +292,6 @@ export class Mangatoto{
                     } else if (variableName === 'imgHttps') {
                         imgHttps = JSON.parse(variableValue);
                     }
-                    
                 }
                 
                 let imgExp = JSON.parse(CryptoJS.AES.decrypt(batoWord, batoPass).toString(CryptoJS.enc.Utf8));
@@ -303,7 +302,7 @@ export class Mangatoto{
                 }
                 
                 newInfo[language].pictureLinks[chapter] = imgLinks;
-                newInfo[language].chapterLength[chapter] = imgLinks.length;
+                newInfo[language].totalPictures[chapter] = imgLinks.length;
 
             } catch (error) {
                 console.warn(`Can't find pictureInfo info at ${info[language].chapterLinks[chapter]} ERROR: ${error}`);

@@ -47,7 +47,7 @@ export class Templater{
             totalChapters: 0,
             chapterTitles: [],
             chapterUploader: [],
-            chapterLength: [],
+            totalPictures: [],
             chapterLinks: [],
             chapterLinksExpire: chapterLinksExpire,
             pictureLinks: [],

@@ -3,170 +3,30 @@ import { Mangatoto }  from './mangatoto.js';
 
 
 export class MetaHandler{
-    
-    makeMetaInfo(infoSources) {
-
-        let mangaSource = ["mangatoto"];
-
-        // Create an array of objects containing the info and its corresponding rating index
-        let infoWithIndexes = infoSources.map(item => ({
-            source: item.source,
-        index: mangaSource.indexOf(item.info)
-        }));
-
-        // Sort the array based on rating index in ascending order
-        infoWithIndexes.sort((a, b) => a.index - b.index);
-
-        // Extract the sorted indexes
-        let bestId = [];
-        let bestIndex = infoWithIndexes.map(item => item.index);
-        for (let i of bestIndex) {
-            bestId.push([`${infoSources[i].source}-${infoSources[i].id}`]);
-        }
-        let metaInfo = {
-            requests: {type: "rank", info: bestId},
-            link: {type: "rank", info: bestId},
-            authors: {type: "accumulativeMinusMatchs", info: null},
-            artists: {type: "accumulativeMinusMatchs", info: null},
-            genres: {type: "accumulativeMinusMatchs", info: null},
-            originalLanguage: {type: "rank", info: bestId},
-            availableLanguages: {type: "rank", info: bestId},
-            displayMethod: {type: "rank", info: bestId},
-            views: {type: "addition", info: null},
-            
-            ratings: {type: "mean", info: "totalReviews"},
-            totalReviews: {type: "addition", info: null},
-            
-            english: {
-                coverImage: {type: "rank", info: bestId},
-                coverImageExpire: {type: "sameSource", info: "english.coverImage"},
-                title: {type: "rank", info: bestId},
-                subtitle: {type: "rank", info: bestId},
-                description: {type: "rank", info: bestId},
-                status: {type: "rank", info: bestId},
-                totalChapters: {type: "greater", info: null},
-                chapterTitles: {type: "rank", info: bestId},
-                chapterUploader: {type: "sameSource", info: "english.totalChapters"},
-                chapterLengths: {type: "sameSource", info: "english.totalChapters"},
-                chapterLinks: {type: "sameSource", info: "english.totalChapters"},
-                chapterLinksExpire : {type: "sameSource", info: "english.totalChapters"},
-                pictureLinks: {type: "sameSource", info: "english.totalChapters"},
-                pictureLinksExpire : {type: "sameSource", info: "english.totalChapters"},
-            }
-        }
-        console.log(metaInfo);
-        return metaInfo;
-    }
-    getBestItem(allItemInfo, meta, metaInfo, snapBack = 0) {
-        /**
-         * This function uses the metadata to determine how to handle to it here a breif description:
-         * 
-         * addition - int or float - add all sources togeter and outputs the total
-         * accumulativeMinusMatchs - list - merges all the list together and removes any matches
-         * greater - int or float - find the biggest value
-         * rank - any - uses info in metadata to detremine what's the best option
-         * mean - num - adds means togetter while keeping the averages blanced
-         * sameSorce - any - do the same as x other thing as stated in metadata info 
-         * 
-         */
-        if (meta.type  == "addition"){
-            let total = 0;
-            for (let itemInfo of allItemInfo){
-                total += itemInfo.info;
-            }
-            // adds everything in list.info togetter
-            return total;
-
-        } if (meta.type == "accumulativeMinusMatchs") {
-            let accumulative;
-            for (let itemInfo of allItemInfo){
-                
-                for (let listItem of itemInfo.info) {
-                    let match = false;
-                    for (let accumulativeItem of accumulative) {
-                        if (accumulativeItem == listItem) {
-                            match = true;
-                        }
-                    }
-                    if (match == false) {
-                        accumulative.push(listItem);
-                    }
-                }
-            }
-            // accumulates everything together except when something matches
-            return accumulative;
-
-        } if (meta.type == "greater") {
-            let biggestItem = 0;
-            for (let itemInfo of allItemInfo) {
-                if (itemInfo.info > biggestItem) {
-                    biggestItem = itemInfo.info;
-                }
-            }
-            // greatest item
-            return biggestItem;
-
-        } if (meta.type == "rank") {
-            let flattenedRank = []
-    
-            meta.info.forEach(function (row) {
-                if (Array.isArray(row)) {
-                    flattenedRank = flattenedRank.concat(row);
-                } else {
-                    flattenedRank.push(row);
-                }
-            });
-
-            for (let targetId in flattenedRank) {
-                for (const dictionary of allItemInfo) {
-                    if (dictionary.id === targetId) {
-                        return dictionary.info;
-                    }
-                }
-            }
-            console.error("No vaild info meeting rank")
-            return null;
-            
-        } if (meta.type == "mean") {
-            let allMeanInfo = metaInfo[meta.info];
-            let mergedList = [];
-                // Iterate over the first list
-                allItemInfo.forEach(item1 => {
-                // Find matching item in the second list
-                let matchingItem = allMeanInfo.find(item2 => item2.id === item1.id);
-                
-                // If a match is found, merge properties and add to the merged list
-                if (matchingItem) {
-                    const mergedItem = {avarage: item1.info, count: matchingItem.info };
-                    mergedList.push(mergedItem);
-                }
-            });
-            let totalCount = 0;
-            let totalavarage = 0;
-            for (let item of mergedList) {
-                totalCount += item.count;
-                totalavarage += item.avarage*item.count;
-            }
-            //avarage
-            return totalavarage/totalCount;
-
-        } if (meta.type == "sameSource") {
-            snapBack += -1;
-            if (snapBack == 0) { // snapBack is used to track how many time getBestItem has called itself. Used to stop infinte loops
-                console.error("ERROR: forced to snapback 2 sameSources are pointing at eachother or sameSources are very indrectly formated");
-                return null;
-            } else {
-                return this.__getBestItem(allItemInfo, metaInfo[meta.info], metaInfo, snapBack);
-            }
-        }
-    }
-    getAllItems(item, infoSources){
+    getAllItems(item, langauge = null, chapter = null, infoSources){
         let allItemInfo = [];
         let tempInfoSources = [];
         // if item in langauge filter info
-        if (item.includes(".")) {
+        if (chapter !== null && langauge !== null) {
             // item in langauge
-            let langauge = item.substring(0, item.indexOf('.'));
+            for (let info of infoSources) {
+                for (let availableLanguage of info.availableLanguages) {
+                    if (langauge == availableLanguage){
+                        if (info[langauge][item][chapter] !== null && info[langauge][item][chapter].length !== 0) {
+                            tempInfoSources.push(info);
+                        }
+                    }
+                }
+            }
+            for (let info of tempInfoSources) {
+                if (info[langauge][item][chapter] == null || info[langauge][item][chapter] == undefined || info[langauge][item][chapter] == "" || info[langauge][item][chapter].length == 0) {
+                    //input is invaild
+                    continue;
+                }
+                allItemInfo.push({"info": info[langauge][item][chapter], "id": `${info.source}-${info.id}`});
+            }
+        } else if (langauge !== null) {
+            // item in langauge
             for (let info of infoSources) {
                 for (let availableLanguage of info.availableLanguages) {
                     if (langauge == availableLanguage){
@@ -174,18 +34,26 @@ export class MetaHandler{
                     }
                 }
             }
+            for (let info of tempInfoSources) {
+                if (info[langauge][item] == null || info[langauge][item] == undefined || info[langauge][item] == "" || info[langauge][item].length == 0) {
+                    //input is invaild
+                    continue;
+                }
+                allItemInfo.push({"info": info[langauge][item], "id": `${info.source}-${info.id}`});
+            }
         } else {
             // not in langauge
-            tempInfoSources = infoSources;
+            tempInfoSources = [...infoSources];
+            for (let info of tempInfoSources) {
+                if (info[item] == null || info[item] == undefined || info[item] == "" || info[item].length == 0) {
+                    //input is invaild
+                    continue;
+                }
+                allItemInfo.push({"info": info[item], "id": `${info.source}-${info.id}`});
+            }
         }
         
-        for (let info of tempInfoSources) {
-            if (info[item] == null || info[item] == undefined || info[item] == "" || info[item].length == 0) {
-                //input is invaild
-                continue;
-            }
-            allItemInfo.push({"info": info[item], "id": `${info.source}-${info.id}`});
-        }
+
         return allItemInfo;
     }
 
@@ -194,23 +62,21 @@ export class RequestHandler{
     constructor() {
         this.mangatoto = new Mangatoto();
     }
-    async request(item, source, chapter, infoSources) {
+    async request(item, langauge, chapter, source, infoSources) {
 
         // Stage 0 create useful vars
-        let dotIndex = item.indexOf('.');
-        let rawItem = dotIndex !== -1 ? item.substring(dotIndex + 1) : item;
-        let rawLangauge = dotIndex !== -1 ? item.substring(0, dotIndex) : item;
-
         let dashIndex = source.indexOf('-');
-        let rawID = dotIndex !== -1 ? source.substring(dotIndex + 1) : source;
-        let rawSource = dotIndex !== -1 ? source.substring(0, dotIndex) : source;
+        let rawID = dashIndex !== -1 ? source.substring(dashIndex + 1) : source;
+        let rawSource = dashIndex !== -1 ? source.substring(0, dashIndex) : source;
 
         // Stage 1 get correct dict from the list infoSources 
         let infoSource = null;
-        for (let infoSourceTest of infoSources) {
-            if (infoSourceTest.id == rawID && infoSourceTest.source == rawSource){
+        let infoSourceIndex;
+        for (let i in infoSources) {
+            if (infoSources[i].id == rawID && infoSources[i].source == rawSource){
                 // Found dict
-                infoSource = infoSourceTest;
+                infoSource = infoSources[i];
+                infoSourceIndex = i;
                 break;
             }
         }
@@ -220,19 +86,132 @@ export class RequestHandler{
         }
 
         // Stage 2 call module functions
-        let newInfoSource;
+        let rawInfoSource;
         if (rawSource == this.mangatoto.source) {
             let inPictureSupport = ["pictureLinks", "chapterLength"];
             if (inPictureSupport.includes(item)) {
-                newInfoSource = await this.mangatoto.picture(infoSource, chapter, rawLangauge);
+                rawInfoSource = await this.mangatoto.picture(infoSource, chapter, langauge);
             } else {
-                newInfoSource = await this.mangatoto.info(infoSource);
+                rawInfoSource = await this.mangatoto.info(infoSource);
+            }
+
+
+            if (rawInfoSource.id && !(Array.isArray(rawInfoSource.id) && rawInfoSource.id.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.id = rawInfoSource.id;
+            }
+            if (rawInfoSource.link && !(Array.isArray(rawInfoSource.link) && rawInfoSource.link.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.link = rawInfoSource.link;
+            }
+            if (rawInfoSource.authors && !(Array.isArray(rawInfoSource.authors) && rawInfoSource.authors.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.authors = rawInfoSource.authors;
+            }
+            if (rawInfoSource.artists && !(Array.isArray(rawInfoSource.artists) && rawInfoSource.artists.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.artists = rawInfoSource.artists;
+            }
+            if (rawInfoSource.genres && !(Array.isArray(rawInfoSource.genres) && rawInfoSource.genres.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.genres = rawInfoSource.genres;
+            }
+            if (rawInfoSource.originalLanguage && !(Array.isArray(rawInfoSource.originalLanguage) && rawInfoSource.originalLanguage.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.originalLanguage = rawInfoSource.originalLanguage;
+            }
+            if (rawInfoSource.availableLanguages && !(Array.isArray(rawInfoSource.availableLanguages) && rawInfoSource.availableLanguages.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.availableLanguages = rawInfoSource.availableLanguages;
+            }
+            if (rawInfoSource.displayMethod && !(Array.isArray(rawInfoSource.displayMethod) && rawInfoSource.displayMethod.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.displayMethod = rawInfoSource.displayMethod;
+            }
+            if (rawInfoSource.views && !(Array.isArray(rawInfoSource.views) && rawInfoSource.views.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.views = rawInfoSource.views;
+            }
+            if (rawInfoSource.ratings && !(Array.isArray(rawInfoSource.ratings) && rawInfoSource.ratings.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.ratings = rawInfoSource.ratings;
+            }
+            if (rawInfoSource.totalReviews && !(Array.isArray(rawInfoSource.totalReviews) && rawInfoSource.totalReviews.length === 0)) {// this if statment checks if the input is mot default
+                infoSource.totalReviews = rawInfoSource.totalReviews;
+            }
+            if (rawInfoSource && rawInfoSource[langauge] !== undefined) {
+                if (rawInfoSource[langauge].coverImage && !(Array.isArray(rawInfoSource[langauge].coverImage) && rawInfoSource[langauge].coverImage.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].coverImage = rawInfoSource[langauge].coverImage;
+                }
+                if (rawInfoSource[langauge].coverImageExpire && !(Array.isArray(rawInfoSource[langauge].coverImageExpire) && rawInfoSource[langauge].coverImageExpire.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].coverImageExpire = rawInfoSource[langauge].coverImageExpire;
+                }
+                if (rawInfoSource[langauge].title && !(Array.isArray(rawInfoSource[langauge].title) && rawInfoSource[langauge].title.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].title = rawInfoSource[langauge].title;
+                }
+                if (rawInfoSource[langauge].subtitle && !(Array.isArray(rawInfoSource[langauge].subtitle) && rawInfoSource[langauge].subtitle.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].subtitle = rawInfoSource[langauge].subtitle;
+                }
+                if (rawInfoSource[langauge].description && !(Array.isArray(rawInfoSource[langauge].description) && rawInfoSource[langauge].description.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource.description = rawInfoSource.description;
+                }
+                if (rawInfoSource[langauge].status && !(Array.isArray(rawInfoSource[langauge].status) && rawInfoSource[langauge].status.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].status = rawInfoSource[langauge].status;
+                }
+                if (rawInfoSource[langauge].totalChapters && !(Array.isArray(rawInfoSource[langauge].totalChapters) && rawInfoSource[langauge].totalChapters.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].totalChapters = rawInfoSource[langauge].totalChapters;
+                }
+                if (rawInfoSource[langauge].chapterTitles && !(Array.isArray(rawInfoSource[langauge].chapterTitles) && rawInfoSource[langauge].chapterTitles.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].chapterTitles = rawInfoSource[langauge].chapterTitles;
+                }
+                if (rawInfoSource[langauge].chapterUploader && !(Array.isArray(rawInfoSource[langauge].chapterUploader) && rawInfoSource[langauge].chapterUploader.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].chapterUploader = rawInfoSource[langauge].chapterUploader;
+                }
+                if (rawInfoSource[langauge].totalPictures[chapter] && !(Array.isArray(rawInfoSource[langauge].totalPictures[chapter]) && rawInfoSource[langauge].totalPictures[chapter].length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].totalPictures[chapter] = rawInfoSource[langauge].totalPictures[chapter];
+                }
+                if (rawInfoSource[langauge].chapterLinks && !(Array.isArray(rawInfoSource[langauge].chapterLinks) && rawInfoSource[langauge].chapterLinks.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].chapterLinks = rawInfoSource[langauge].chapterLinks;
+                }
+                if (rawInfoSource[langauge].chapterLinksExpire && !(Array.isArray(rawInfoSource[langauge].chapterLinksExpire) && rawInfoSource[langauge].chapterLinksExpire.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].chapterLinksExpire = rawInfoSource[langauge].chapterLinksExpire;
+                }
+                if (rawInfoSource[langauge].pictureLinks[chapter] && !(Array.isArray(rawInfoSource[langauge].pictureLinks[chapter]) && rawInfoSource[langauge].pictureLinks[chapter].length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].pictureLinks[chapter] = rawInfoSource[langauge].pictureLinks[chapter];
+                }
+                if (rawInfoSource[langauge].pictureLinksExpire && !(Array.isArray(rawInfoSource[langauge].pictureLinksExpire) && rawInfoSource[langauge].pictureLinksExpire.length === 0)) {// this if statment checks if the input is mot default
+                    infoSource[langauge].pictureLinksExpire = rawInfoSource[langauge].pictureLinksExpire;
+                }
+            } else {
+                console.error("langauge not vaild")
             }
         }
 
         // Stage 3 Modify infoSources
+        
+        infoSources[infoSourceIndex] = infoSource;
+        return infoSources;
+    }
 
-
-        // Stage 4 packup
+    async parallelRequests(item, language, chapter, requestGroup, infoSources) {
+        if (!Array.isArray(requestGroup)) {
+            console.error("Invallid Input: requestGroup is not list");
+            return null;
+        }
+        const parallelRequests = [];
+    
+        // Iterate through the second dimension of requestGroup
+        for (let i = 0; i < requestGroup.length; i++) {
+            // Create a promise for each request
+            const requestPromise = new Promise((resolve, reject) => {
+                // Make the request
+                this.request(item, language, chapter, requestGroup[i], infoSources)
+                    .then(response => {
+                        resolve(response); // Resolve the promise with the response
+                    })
+                    .catch(error => {
+                        reject(error); // Reject the promise if there's an error
+                    });
+            });
+            parallelRequests.push(requestPromise); // Add the promise to the array
+        }
+    
+        try {
+            // Execute all promises in parallel
+            const responses = await Promise.all(parallelRequests);
+            return responses; // Return responses when all requests are completed
+        } catch (error) {
+            throw error; // Throw any error that occurs during requests
+        }
     }
 }
