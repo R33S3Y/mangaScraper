@@ -1,5 +1,6 @@
 // mangaScraper.js
-import { MetaHandler, RequestHandler }  from './mangaScraperHelper.js';
+import { MetaHandler, RequestHandler }  from './mangaScraperSupport.js';
+import { Mangatoto }  from './mangatoto.js';
 
 
 export class MangaSearch {
@@ -12,6 +13,7 @@ export class Manga {
     constructor() {
         this.metahandler = new MetaHandler();
         this.requesthandler = new RequestHandler();
+        this.mangatoto = new Mangatoto();
 
         this.sourceRank = []; 
         
@@ -43,7 +45,7 @@ export class Manga {
          *                    totalChapters: 6,
          *                    chapterTitles: ["Volume 1 Chapter 1", "Volume 1 Chapter 2", etc],
          *                    chapterUploader: [{name: "Rika fujiwara"}],
-         *                    totalPictures: [26, 24, etc], // How many pictures are in a chapter
+         *                    chapterLength: [26, 24, etc], // How many pictures are in a chapter
          *                    chapterLinks: ["https://mangatoto.com/chapter/2625924", "https://mangatoto.com/chapter/2644871", etc],
          *                    chapterLinksExpire : False
          *                    pictureLinks: [
@@ -59,7 +61,7 @@ export class Manga {
     }
 
 
-    async update(items, langauge = null, chapter = null, maxParallelRequests = 2) {
+    async update(items, langauge = null, chapter = 0, maxParallelRequests = 2) {
 
         // Check that items is vaild
         let standaloneOutput = false;
@@ -71,18 +73,15 @@ export class Manga {
             standaloneOutput = true;
             items = [items];
         }
+        // add check that sourceRank is array
         // Add check here to make sure that items[i] = vaild string (I dont know the full list now) ; )
         // for item in items:
         for (let item of items) {
-            
-            let allItemInfo = [];
-            allItemInfo = this.metahandler.getAllItems(item, langauge, chapter, this.infoSources);
-
             /**
              * If the following check has failed this means that there is none of that info locally and we need to do a network request
              */
-            if (allItemInfo.length == 0){
-                
+            if (this.metahandler.countItem(item, langauge, chapter, this.infoSources) !== 0){
+
                 /**
                  * The following code attempts to use the genric ranking from "this.metaInfo.request.info" (Yes I know I amazing at naming things!! :3 ) 
                  * to determine the best order to do the requests.
@@ -111,38 +110,42 @@ export class Manga {
                  * Although as you can see it intentionally avoided merging ranks to fill requests.
                  * This is intentional although I may add a flag/setting to merge.
                  */
+
                 let rawRequestOrder = this.sourceRank;
                 let requestOrder = [];
+
                 for (let rank of rawRequestOrder) {
+
                     let requestItem = [];
-                    while(rank.length > 0){
-                        if (requestItem.length == maxParallelRequests) {
+                    while(rank.length !== 0){
+
+                        if (requestItem.length >= maxParallelRequests) {
                             requestOrder.push(requestItem);
                             requestItem = [];
                         }
                         requestItem.push(rank[0]);
+                        rank.shift()
                     }
+
                     requestOrder.push(requestItem);
                 }
+                //Make request
                 for (let requestGroup of requestOrder) {
-                    console.log(item);
-                    console.log()
-                    let parallelRequestsOut = this.requesthandler.parallelRequests(item, langauge, chapter, requestGroup, this.infoSources);
+                    let parallelRequestsOut = await this.requesthandler.parallelizeRequests(item, langauge, chapter, requestGroup, this.infoSources);
                     if (parallelRequestsOut !== null) {
                         this.infoSources = parallelRequestsOut;
-                    }
-                    if (this.metahandler.getAllItems(item, langauge, chapter, this.infoSources.length !== 0)) {
-                        break;
+                        if (this.metahandler.countItem(item, langauge, chapter, this.infoSources) !== 0) {
+                            break;
+                        }
                     }
                 }
             }
         }
     }
 
-    get(item, langauge = null, chapter = null) {
-        let allItemInfo = this.metahandler.getAllItems(item, langauge, chapter, this.infoSources);
-
-        return allItemInfo;
+    get(item, langauge = null, chapter = 0) {
+        let hold = this.metahandler.getItems(item, langauge, chapter, this.infoSources);
+        return hold;
     }
 }
 

@@ -1,7 +1,6 @@
 //mangatoto.js
 
-import { Templater, InputChecker, ParserHelpers }  from './moduleHelper.js';
-
+import { Templater, InputChecker, ParserHelpers }  from './fetcherSupport.js';
 
 export class Mangatoto{
     constructor() {
@@ -24,16 +23,16 @@ export class Mangatoto{
         // Make template
         const newInfo = this.templater.makeBaseTemplate(info);
 
-        // Get website
-        fetch(info.link)
-        .then(response => {
+        try {
+            // Get website
+            const response = await fetch(info.link);
+            
             if (!response.ok) {
                 console.error(`Couldn't access ${info.link} status code: ${response.status}`);
                 return null;
             }
-            return response.text();
-        })
-        .then(html => {
+
+            const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
@@ -67,7 +66,7 @@ export class Mangatoto{
             newInfo[language] = this.templater.makeLanguageTemplate(true, false);
 
             
-            newInfo.id = newInfo.source.match(/\/series\/(\d+)\//)[1];
+            newInfo.id = newInfo.link.match(/\/series\/(\d+)\//)[1];
 
             try {
                 // Get authors info
@@ -223,11 +222,12 @@ export class Mangatoto{
                 // Function is still useful if chapters info can't be found
             }
             
-        })
-        .catch(error => console.error('Error:', error));
-
-        console.log(newInfo);
-        return newInfo
+            console.debug(newInfo);
+            return newInfo;
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
     }
 
     async picture(info, chapter, language){
@@ -254,16 +254,16 @@ export class Mangatoto{
         const newInfo = this.templater.makeBaseTemplate(info);
         newInfo[language] = this.templater.makeLanguageTemplate(true, false, true);
 
-        // Get website
-        fetch(info[language].chapterLinks[chapter])
-        .then(response => {
+        try {
+            // Get website
+            const response = await fetch(info[language].chapterLinks[chapter]);
+            
             if (!response.ok) {
                 console.error(`Couldn't access ${info[language].chapterLinks[chapter]} status code: ${response.status}`);
                 return null;
             }
-            return response.text();
-        })
-        .then(html => {
+    
+            const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
@@ -302,16 +302,18 @@ export class Mangatoto{
                 }
                 
                 newInfo[language].pictureLinks[chapter] = imgLinks;
-                newInfo[language].totalPictures[chapter] = imgLinks.length;
+                newInfo[language].chapterLength[chapter] = imgLinks.length;
 
             } catch (error) {
                 console.warn(`Can't find pictureInfo info at ${info[language].chapterLinks[chapter]} ERROR: ${error}`);
                 // Function is still useful if pictureInfo info can't be found
             }
-        })
-        .catch(error => console.error('Error:', error));
 
-        console.log(newInfo);
-        return newInfo;
+            console.debug(newInfo);
+            return newInfo;
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
     }
 }
