@@ -1,4 +1,3 @@
-// tester.js
 
 import { MangaSearch, Manga } from './mangaScraper/mangaScraper.js';
 
@@ -41,6 +40,6 @@ await manga.update("title", "english");
 
 let titles = manga.get("title", "english");
 
-
+console.log(titles);
 let p = document.getElementById("1");
 p.innerHTML = titles[0].item;

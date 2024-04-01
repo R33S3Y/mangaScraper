@@ -1,6 +1,10 @@
 //mangatoto.js
 
-import { Templater, InputChecker, ParserHelpers }  from './fetcherSupport.js';
+//import { Templater, InputChecker, ParserHelpers }  from '../Support/fetcherSupport.js';
+import { Templater } from '../Support/templater.js';
+import { InputChecker } from '../Support/inputChecker.js';
+import { ParserHelpers } from '../Support/parserHelpers.js';
+
 
 export class Mangatoto{
     constructor() {
@@ -34,7 +38,7 @@ export class Mangatoto{
 
             const html = await response.text();
             const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
+            const doc = parser.parseFromString(html, 'text/html', { contentType: 'text/html', scripting: 'disabled' });
 
             // Figure out what language the manga is in.
             let language;

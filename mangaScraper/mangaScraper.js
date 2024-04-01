@@ -1,7 +1,6 @@
-// mangaScraper.js
-import { MetaHandler, RequestHandler }  from './mangaScraperSupport.js';
-import { Mangatoto }  from './mangatoto.js';
 
+import { RequestHandler }  from './mangaScraperBackend.js';
+import { InfoSourceHelper } from './Support/infoSourceHelper.js';
 
 export class MangaSearch {
     static search() {
@@ -11,9 +10,8 @@ export class MangaSearch {
 
 export class Manga {
     constructor() {
-        this.metahandler = new MetaHandler();
+        this.infoSourceHelper = new InfoSourceHelper();
         this.requesthandler = new RequestHandler();
-        this.mangatoto = new Mangatoto();
 
         this.sourceRank = []; 
         
@@ -80,7 +78,7 @@ export class Manga {
             /**
              * If the following check has failed this means that there is none of that info locally and we need to do a network request
              */
-            if (this.metahandler.countItem(item, langauge, chapter, this.infoSources) !== 0){
+            if (this.infoSourceHelper.countItem(item, langauge, chapter, this.infoSources) !== 0){
 
                 /**
                  * The following code attempts to use the genric ranking from "this.metaInfo.request.info" (Yes I know I amazing at naming things!! :3 ) 
@@ -134,7 +132,7 @@ export class Manga {
                     let parallelRequestsOut = await this.requesthandler.parallelizeRequests(item, langauge, chapter, requestGroup, this.infoSources);
                     if (parallelRequestsOut !== null) {
                         this.infoSources = parallelRequestsOut;
-                        if (this.metahandler.countItem(item, langauge, chapter, this.infoSources) !== 0) {
+                        if (this.infoSourceHelper.countItem(item, langauge, chapter, this.infoSources) !== 0) {
                             break;
                         }
                     }
@@ -144,7 +142,7 @@ export class Manga {
     }
 
     get(item, langauge = null, chapter = 0) {
-        let hold = this.metahandler.getItems(item, langauge, chapter, this.infoSources);
+        let hold = this.infoSourceHelper.getItems(item, langauge, chapter, this.infoSources);
         return hold;
     }
 }

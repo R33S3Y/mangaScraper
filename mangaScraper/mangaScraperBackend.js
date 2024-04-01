@@ -1,5 +1,5 @@
 
-import { Mangatoto }  from './mangatoto.js';
+import { Mangatoto }  from './Fetchers/mangatoto.js';
 
 
 export class MetaHandler{
@@ -69,7 +69,12 @@ export class MetaHandler{
                 }
             }
         }
-        return itemValues;
+
+        return itemValues; 
+        // The code below verifys that the input meaning that but instead of that it could be very good 
+        // to insteed to just inforce haveing defualts
+        // Also there's an error in the for loop were the var value = "0" for some reason. 
+
         if (calledInternally === true) {
             return itemValues;
         }
@@ -101,6 +106,7 @@ export class MetaHandler{
         return vaildItems;
     }
 }
+
 export class RequestHandler{
     constructor() {
         this.mangatoto = new Mangatoto();
@@ -219,12 +225,7 @@ export class RequestHandler{
                     }
                     if (rawInfoSource[availableLanguage].chapterLinks && !(Array.isArray(rawInfoSource[availableLanguage].chapterLinks) && rawInfoSource[availableLanguage].chapterLinks.length === 0)) {// this if statment checks if the input is mot default
                         infoSource[availableLanguage].chapterLinks = rawInfoSource[availableLanguage].chapterLinks;
-                    }
-                    if (rawInfoSource[availableLanguage].chapterLinksExpire && !(Array.isArray(rawInfoSource[availableLanguage].chapterLinksExpire) && rawInfoSource[availableLanguage].chapterLinksExpire.length === 0)) {// this if statment checks if the input is mot default
-                        infoSource[availableLanguage].chapterLinksExpire = rawInfoSource[availableLanguage].chapterLinksExpire;
-                    }
-                    if (rawInfoSource[availableLanguage].pictureLinks[chapter] && !(Array.isArray(rawInfoSource[availableLanguage].pictureLinks[chapter]) && rawInfoSource[availableLanguage].pictureLinks[chapter].length === 0)) {// this if statment checks if the input is mot default
-                        infoSource[availableLanguage].pictureLinks[chapter] = rawInfoSource[availableLanguage].pictureLinks[chapter];
+                  etaHand      infoSource[availableLanguage].pictureLinks[chapter] = rawInfoSource[availableLanguage].pictureLinks[chapter];
                     }
                     if (rawInfoSource[availableLanguage].pictureLinksExpire && !(Array.isArray(rawInfoSource[availableLanguage].pictureLinksExpire) && rawInfoSource[availableLanguage].pictureLinksExpire.length === 0)) {// this if statment checks if the input is mot default
                         infoSource[availableLanguage].pictureLinksExpire = rawInfoSource[availableLanguage].pictureLinksExpire;
