@@ -36,10 +36,18 @@ manga.infoSources = [{
     }
 }];
 
-await manga.update("title", "english");
+let chapter = 1;
 
-let titles = manga.get("title", "english");
+await manga.update(["pictureLinks","title"], "english", chapter);
+
+let titles = manga.get("title", "english", 0);
+let pictureLinks = manga.get("pictureLinks", "english", chapter);
 
 console.log(titles);
+console.log(pictureLinks);
+
 let p = document.getElementById("1");
-p.innerHTML = titles[0].item;
+p.innerHTML = titles;
+
+let img = document.getElementById("2");
+img.src = pictureLinks[chapter][0];

@@ -59,7 +59,16 @@ export class Manga {
     }
 
 
-    async update(items, langauge = null, chapter = 0, maxParallelRequests = 2) {
+    async update(items, langauge, chapter = 0, maxParallelRequests = 2) {
+        /**
+         * returns nothing. Just updates the value of the item requested
+         * @param {Array} item - list of names of the items you want to get update
+         * @param {string} langauge - the langauge of the info you want
+         * @param {Int} chapter - what chapter do you want the info from.
+         * @param {Int} maxParallelRequests - how many requests can the function make in parallel
+         * 
+         * @example await manga.update(["pictureLinks","title"], "english", chapter);
+         */
 
         // Check that items is vaild
         let standaloneOutput = false;
@@ -78,7 +87,7 @@ export class Manga {
             /**
              * If the following check has failed this means that there is none of that info locally and we need to do a network request
              */
-            if (this.infoSourceHelper.countItem(item, langauge, chapter, this.infoSources) !== 0){
+            if (this.infoSourceHelper.countItem(item, langauge, chapter, this.infoSources) == 0){
 
                 /**
                  * The following code attempts to use the genric ranking from "this.metaInfo.request.info" (Yes I know I amazing at naming things!! :3 ) 
@@ -109,7 +118,7 @@ export class Manga {
                  * This is intentional although I may add a flag/setting to merge.
                  */
 
-                let rawRequestOrder = this.sourceRank;
+                let rawRequestOrder = JSON.parse(JSON.stringify(this.sourceRank)); // This is done to make a deep copy of sourceRank
                 let requestOrder = [];
 
                 for (let rank of rawRequestOrder) {
@@ -127,6 +136,7 @@ export class Manga {
 
                     requestOrder.push(requestItem);
                 }
+
                 //Make request
                 for (let requestGroup of requestOrder) {
                     let parallelRequestsOut = await this.requesthandler.parallelizeRequests(item, langauge, chapter, requestGroup, this.infoSources);
@@ -141,9 +151,47 @@ export class Manga {
         }
     }
 
-    get(item, langauge = null, chapter = 0) {
+    get(item, langauge, chapter = 0, outputAll = false, outputSource = false) {
+        /**
+         * Gets/returns the value of the item requested
+         * @param {string} item - name of the item you want to get
+         * @param {string} langauge - the langauge of the info you want
+         * @param {Int} chapter - what chapter do you want the info from.
+         * @param {boolean} outputAll - if true function will output a list of all values
+         * @param {boolean} outputSource - if true function will output dicts containg item and id
+         * 
+         * @example let pictureLinks = Manga.get("pictureLinks", "english", chapter);
+         */
+
+        //get all info
         let hold = this.infoSourceHelper.getItems(item, langauge, chapter, this.infoSources);
-        return hold;
-    }
+        
+        //sort data
+        let flatSourceRank = this.sourceRank.reduce((acc, curr) => {
+            return acc.concat(curr);
+        }, []);
+        let reorderedData = flatSourceRank.map(id => {
+            return hold.find(item => item.id === id);
+        });
+
+        // makes it so the list is only 1 item long
+        if (outputAll === false) {
+            reorderedData = [reorderedData[0]];
+        }
+
+        // removes dict
+        if (outputSource === false) {
+            for (let i = 0; i < reorderedData.length; i++) {
+                reorderedData[i] = reorderedData[i].item;
+            }
+        }
+
+        // removes list
+        if (outputAll === false) {
+            reorderedData = reorderedData[0];
+        }
+
+        return reorderedData;
+    }   
 }
 

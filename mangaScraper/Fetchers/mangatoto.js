@@ -4,6 +4,7 @@
 import { Templater } from '../Support/templater.js';
 import { InputChecker } from '../Support/inputChecker.js';
 import { ParserHelpers } from '../Support/parserHelpers.js';
+import { Merge } from '../Support/merger.js'
 
 
 export class Mangatoto{
@@ -11,6 +12,7 @@ export class Mangatoto{
         this.templater = new Templater();
         this.inputChecker = new InputChecker();
         this.parserHelpers = new ParserHelpers();
+        this.merge = new Merge();
         this.source = "mangatoto"
     }
 
@@ -67,7 +69,7 @@ export class Mangatoto{
                 }
             }
 
-            newInfo[language] = this.templater.makeLanguageTemplate(true, false);
+            newInfo[language] = this.templater.makeLanguageTemplate(false, false, false);
 
             
             newInfo.id = newInfo.link.match(/\/series\/(\d+)\//)[1];
@@ -227,7 +229,7 @@ export class Mangatoto{
             }
             
             console.debug(newInfo);
-            return newInfo;
+            return this.merge.info(info, newInfo);
         } catch (error) {
             console.error('Error:', error);
             return null;
@@ -239,14 +241,11 @@ export class Mangatoto{
         let [checker, infoFix]  = this.inputChecker.pictureInputCheck(info, chapter, language, this.source);
         if (checker !== true) {
             if (infoFix == true){
-                let newInfo = this.info(info)
+                let newInfo = await this.info(info);
                 if (newInfo == null) {
                     return null;
                 } else {
-                    if (!newInfo[language].chapterLinks[chapter]) {
-                        return null;
-                    }
-                    info[language].chapterLinks[chapter] = newInfo[language].chapterLinks[chapter];
+                    info = this.merge.info(info,newInfo);
                 }
             } else {
                 return null;
@@ -256,7 +255,7 @@ export class Mangatoto{
 
         // Make template
         const newInfo = this.templater.makeBaseTemplate(info);
-        newInfo[language] = this.templater.makeLanguageTemplate(true, false, true);
+        newInfo[language] = this.templater.makeLanguageTemplate(false, false, false);
 
         try {
             // Get website
@@ -277,10 +276,10 @@ export class Mangatoto{
                 const pictureInfo = pictureInfoElement ? pictureInfoElement.textContent.trim() : null;
 
                 // Define a regular expression to match specific variables
-                const variableRegex = /const\s+(batoWord|batoPass|imgHttps)\s*=\s*([^;]+);/g;
+                const variableRegex = /const\s+(imgHttps)\s*=\s*([^;]+);/g;
 
                 // Initialize variables to store extracted values
-                let batoWord, batoPass, imgHttps;
+                let imgHttps;
 
                 // Match and extract variables using the regular expression
                 let match;
@@ -289,20 +288,15 @@ export class Mangatoto{
                     const variableValue = match[2].trim();
 
                     // Assign the extracted value to the corresponding variable
-                    if (variableName === 'batoWord') {
-                        batoWord = variableValue.slice(1, -1);
-                    } else if (variableName === 'batoPass') {
-                        batoPass = eval(variableValue);
-                    } else if (variableName === 'imgHttps') {
+                    if (variableName === 'imgHttps') {
                         imgHttps = JSON.parse(variableValue);
                     }
                 }
                 
-                let imgExp = JSON.parse(CryptoJS.AES.decrypt(batoWord, batoPass).toString(CryptoJS.enc.Utf8));
                 let imgLinks = [];
 
                 for (const index in imgHttps){
-                    imgLinks.push(`${imgHttps[index]}?${imgExp[index]}`);
+                    imgLinks.push(imgHttps[index]);
                 }
                 
                 newInfo[language].pictureLinks[chapter] = imgLinks;
@@ -310,11 +304,10 @@ export class Mangatoto{
 
             } catch (error) {
                 console.warn(`Can't find pictureInfo info at ${info[language].chapterLinks[chapter]} ERROR: ${error}`);
-                // Function is still useful if pictureInfo info can't be found
             }
 
             console.debug(newInfo);
-            return newInfo;
+            return this.merge.info(info, newInfo);
         } catch (error) {
             console.error('Error:', error);
             return null;

@@ -61,7 +61,7 @@ export class InputChecker{
         }
 
         if (info[language].chapterLinks[chapter] == undefined || info[language].chapterLinks[chapter] == null) {
-            console.error(`Invalid input: ${source}.js needs language to be inputted when calling picture`);
+            console.warn(`Invalid input: ${source}.js needs chapterLinks when calling picture can be fixed with info call`);
             return [false, true];
         }
         
