@@ -1,4 +1,4 @@
-//mangatoto.js
+
 
 //import { Templater, InputChecker, ParserHelpers }  from '../Support/fetcherSupport.js';
 import { Templater } from '../Support/templater.js';
@@ -99,7 +99,7 @@ export class Mangatoto{
                 const genresElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Genres:');
                 const genres = genresElement ? genresElement.nextElementSibling.querySelectorAll(['span','u']) : null;
             
-                newInfo.genres = Array.from(genres).map(item => (item.textContent));;
+                newInfo.genres = Array.from(genres).map(item => (item.textContent));
             } catch (error) {
                 console.warn(`Can't find genres info at ${info.link}`);
                 // Function is still useful if genres info can't be found

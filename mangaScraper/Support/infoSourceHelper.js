@@ -111,7 +111,7 @@ export class InfoSourceHelper{
 
         // Stage 1 get correct dict from the list infoSources 
         let info = null;
-        let infoSourceIndex;
+        
         for (let i in infoSources) {
             if (infoSources[i].id == rawID && infoSources[i].source == rawSource){
                 // Found dict

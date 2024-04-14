@@ -2,7 +2,7 @@
 import { MangaSearch, Manga } from './mangaScraper/mangaScraper.js';
 
 
-const manga = new Manga();
+let manga = new Manga();
 manga.sourceRank = [["mangatoto-103606"]];
 manga.infoSources = [{
     source: "mangatoto",
