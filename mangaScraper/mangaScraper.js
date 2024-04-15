@@ -1,6 +1,7 @@
 
 import { RequestHandler }  from './mangaScraperBackend.js';
 import { InfoSourceHelper } from './Support/infoSourceHelper.js';
+import { Templater } from './Support/templater.js';
 
 export class MangaSearch {
     static search() {
@@ -12,9 +13,23 @@ export class Manga {
     constructor() {
         this.infoSourceHelper = new InfoSourceHelper();
         this.requesthandler = new RequestHandler();
+        this.templater = new Templater();
 
         this.sourceRank = []; 
         
+        // Config stores all default function params
+        this.config = {
+            // Genric
+            langauge : null,
+            chapter : 0,
+
+            // Update
+            maxParallelRequests : 2,
+
+            // Get
+            outputAll : false,
+            outputSource : false
+        }
         // INFO
         
         this.infoSources = [];
@@ -59,7 +74,7 @@ export class Manga {
     }
 
 
-    async update(items, langauge, chapter = 0, maxParallelRequests = 2) {
+    async update(items, langauge = this.config.langauge, chapter = this.config.chapter, maxParallelRequests = this.config.maxParallelRequests) {
         /**
          * returns nothing. Just updates the value of the item requested
          * @param {Array} item - list of names of the items you want to get update
@@ -151,7 +166,7 @@ export class Manga {
         }
     }
 
-    get(item, langauge, chapter = 0, outputAll = false, outputSource = false) {
+    get(item, langauge = this.config.langauge, chapter = this.config.chapter, outputAll = this.config.outputAll, outputSource = this.config.outputSource) {
         /**
          * Gets/returns the value of the item requested
          * @param {string} item - name of the item you want to get
@@ -193,5 +208,9 @@ export class Manga {
 
         return reorderedData;
     }   
+
+    template(langauge = this.config.langauge) {
+        
+    }
 }
 
