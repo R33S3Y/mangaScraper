@@ -13,7 +13,7 @@ export class RequestHandler{
         this.mangatoto = new Mangatoto();
 
     }
-    async distributeRequest(item, langauge, chapter, source, info) {
+    async distributeRequest(item, language, chapter, source, info) {
         // Stage 0 create useful vars
         let dashIndex = source.indexOf('-');
         let rawID = dashIndex !== -1 ? source.substring(dashIndex + 1) : source;
@@ -25,7 +25,7 @@ export class RequestHandler{
         if (rawSource == this.mangatoto.source) {
             let inPictureSupport = ["pictureLinks", "chapterLength"];
             if (inPictureSupport.includes(item)) {
-                info = await this.mangatoto.picture(info, chapter, langauge);
+                info = await this.mangatoto.picture(info, chapter, language);
             } else {
                 info = await this.mangatoto.info(info);
             }

@@ -1,7 +1,7 @@
-
 import { RequestHandler }  from './mangaScraperBackend.js';
 import { InfoSourceHelper } from './Support/infoSourceHelper.js';
 import { Templater } from './Support/templater.js';
+
 
 export class MangaSearch {
     static search() {
@@ -20,7 +20,7 @@ export class Manga {
         // Config stores all default function params
         this.config = {
             // Genric
-            langauge : null,
+            language : null,
             chapter : 0,
 
             // Update
@@ -74,11 +74,11 @@ export class Manga {
     }
 
 
-    async update(items, langauge = this.config.langauge, chapter = this.config.chapter, maxParallelRequests = this.config.maxParallelRequests) {
+    async update(items, language = this.config.language, chapter = this.config.chapter, maxParallelRequests = this.config.maxParallelRequests) {
         /**
          * returns nothing. Just updates the value of the item requested
          * @param {Array} item - list of names of the items you want to get update
-         * @param {string} langauge - the langauge of the info you want
+         * @param {string} language - the language of the info you want
          * @param {Int} chapter - what chapter do you want the info from.
          * @param {Int} maxParallelRequests - how many requests can the function make in parallel
          * 
@@ -102,7 +102,7 @@ export class Manga {
             /**
              * If the following check has failed this means that there is none of that info locally and we need to do a network request
              */
-            if (this.infoSourceHelper.countItem(item, langauge, chapter, this.infoSources) == 0){
+            if (this.infoSourceHelper.countItem(item, language, chapter, this.infoSources) == 0){
 
                 /**
                  * The following code attempts to use the genric ranking from "this.metaInfo.request.info" (Yes I know I amazing at naming things!! :3 ) 
@@ -154,10 +154,10 @@ export class Manga {
 
                 //Make request
                 for (let requestGroup of requestOrder) {
-                    let parallelRequestsOut = await this.requesthandler.parallelizeRequests(item, langauge, chapter, requestGroup, this.infoSources);
+                    let parallelRequestsOut = await this.requesthandler.parallelizeRequests(item, language, chapter, requestGroup, this.infoSources);
                     if (parallelRequestsOut !== null) {
                         this.infoSources = parallelRequestsOut;
-                        if (this.infoSourceHelper.countItem(item, langauge, chapter, this.infoSources) !== 0) {
+                        if (this.infoSourceHelper.countItem(item, language, chapter, this.infoSources) !== 0) {
                             break;
                         }
                     }
@@ -166,11 +166,11 @@ export class Manga {
         }
     }
 
-    get(item, langauge = this.config.langauge, chapter = this.config.chapter, outputAll = this.config.outputAll, outputSource = this.config.outputSource) {
+    get(item, language = this.config.language, chapter = this.config.chapter, outputAll = this.config.outputAll, outputSource = this.config.outputSource) {
         /**
          * Gets/returns the value of the item requested
          * @param {string} item - name of the item you want to get
-         * @param {string} langauge - the langauge of the info you want
+         * @param {string} language - the language of the info you want
          * @param {Int} chapter - what chapter do you want the info from.
          * @param {boolean} outputAll - if true function will output a list of all values
          * @param {boolean} outputSource - if true function will output dicts containg item and id
@@ -179,7 +179,7 @@ export class Manga {
          */
 
         //get all info
-        let hold = this.infoSourceHelper.getItems(item, langauge, chapter, this.infoSources);
+        let hold = this.infoSourceHelper.getItems(item, language, chapter, this.infoSources);
         
         //sort data
         let flatSourceRank = this.sourceRank.reduce((acc, curr) => {
@@ -208,9 +208,17 @@ export class Manga {
 
         return reorderedData;
     }   
+    /**
+    template(source = null, language = this.config.language) {
+        //make vars
+        let newInfo;
+        let oldInfo;
+        //getold info
+        oldInfo = this.infoSourceHelper.getInfo(source, this.infoSources);
 
-    template(langauge = this.config.langauge) {
-        
+        newInfo = this.templater.makeBaseTemplate(oldInfo);
+        newInfo[language] = this.templater.makeLanguageTemplate(false, false, false);
     }
+    */
 }
 
