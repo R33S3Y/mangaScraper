@@ -1,6 +1,6 @@
 
 export class InfoSourceHelper{
-    countItem(item, langauge = null, chapter = null, infoSources, calledInternally = false){
+    countItem(item, language = null, chapter = null, infoSources, calledInternally = false){
         //gets all items
         let itemValues = [];
 
@@ -9,9 +9,9 @@ export class InfoSourceHelper{
                 itemValues.push(infoSources[i][item]);
             } else {
                 for (let prop in infoSources[i]) {
-                    if (typeof infoSources[i][prop] === 'object' && prop === langauge.toLowerCase()) {
+                    if (typeof infoSources[i][prop] === 'object' && prop === language.toLowerCase()) {
                         
-                        itemValues = itemValues.concat(this.countItem(item, langauge, chapter, [infoSources[i][prop]], true));
+                        itemValues = itemValues.concat(this.countItem(item, language, chapter, [infoSources[i][prop]], true));
                     }
                 }
             }
@@ -44,7 +44,7 @@ export class InfoSourceHelper{
         return vaildItems.length;
     }
 
-    getItems(item, langauge = null, chapter = null, infoSources, calledInternally = false){
+    getItems(item, language = null, chapter = null, infoSources, calledInternally = false){
         //gets all items
         let itemValues = [];
 
@@ -57,11 +57,11 @@ export class InfoSourceHelper{
                 itemValues.push(obj);
             } else {
                 for (let prop in infoSources[i]) {
-                    if (typeof infoSources[i][prop] === 'object' && prop === langauge.toLowerCase()) {
+                    if (typeof infoSources[i][prop] === 'object' && prop === language.toLowerCase()) {
                         let obj = {...infoSources[i][prop]};
                         obj.id = infoSources[i].id;
                         obj.source = infoSources[i].source;
-                        itemValues = itemValues.concat(this.getItems(item, langauge, chapter, [obj], true));
+                        itemValues = itemValues.concat(this.getItems(item, language, chapter, [obj], true));
                     }
                 }
             }

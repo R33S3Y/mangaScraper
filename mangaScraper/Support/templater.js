@@ -1,6 +1,6 @@
 
 export class Templater{
-    makeBaseTemplate(info){
+    makeBaseTemplate(info = null){
         /**
          * makes the same base template as inputed by mangaScraper
          * 
@@ -9,10 +9,11 @@ export class Templater{
          * 
          * @example const newInfo = this.templater.makeBaseTemplate(info);
          */
+
         const template = {
-            source: info.source,
+            source: "",
             id: 0,
-            link: info.link,
+            link: "",
             authors: [],
             artists: [],
             genres: [],
@@ -23,6 +24,12 @@ export class Templater{
             rating: 0,
             totalReviews: 0,
         };
+
+        if (!info == null) {
+            template.source = info.source;
+            template.link = info.link;
+        }
+        
         return template
     }
 

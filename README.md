@@ -13,6 +13,10 @@ MangaScraper currently supports the collection of info from:
 
 **Note:** if the website you want to collect info from is not on this list you can go write a fetcher for it by follow the guide that can be found [Here](mangaScraper/Docs/Making%20Fetchers.md).
 
+## Change Log
+
+You can see the change log [Here](mangaScraper/Docs/ChangeLog.md).
+
 ## Setup 
 To set up MangaScraper Just Import it into your JS as shown here:
 ```
