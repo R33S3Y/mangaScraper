@@ -25,7 +25,7 @@ export class Templater{
             totalReviews: 0,
         };
 
-        if (!info == null) {
+        if (info !== null) {
             template.source = info.source;
             template.link = info.link;
         }

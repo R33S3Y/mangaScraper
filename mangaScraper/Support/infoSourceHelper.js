@@ -105,6 +105,11 @@ export class InfoSourceHelper{
 
     getInfo(source, infoSources) {
         // Stage 0 create useful vars
+
+        if (source == null) {
+            return null;
+        }
+        
         let dashIndex = source.indexOf('-');
         let rawID = dashIndex !== -1 ? source.substring(dashIndex + 1) : source;
         let rawSource = dashIndex !== -1 ? source.substring(0, dashIndex) : source;
@@ -125,14 +130,16 @@ export class InfoSourceHelper{
     }
 
     getInfoIndex(source, infoSources) {
+        if (source == null) {
+            return null;
+        }
+        
         // Stage 0 create useful vars
         let dashIndex = source.indexOf('-');
         let rawID = dashIndex !== -1 ? source.substring(dashIndex + 1) : source;
         let rawSource = dashIndex !== -1 ? source.substring(0, dashIndex) : source;
 
         // Stage 1 get correct dict from the list infoSources 
-        let info = null;
-        let infoSourceIndex;
         for (let i in infoSources) {
             if (infoSources[i].id == rawID && infoSources[i].source == rawSource){
                 // Found dict
