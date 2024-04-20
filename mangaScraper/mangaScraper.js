@@ -1,6 +1,7 @@
 import { RequestHandler }  from './mangaScraperBackend.js';
 import { InfoSourceHelper } from './Support/infoSourceHelper.js';
 import { Templater } from './Support/templater.js';
+import { Merge } from './Support/merger.js';
 
 
 export class MangaSearch {
@@ -14,6 +15,7 @@ export class Manga {
         this.infoSourceHelper = new InfoSourceHelper();
         this.requesthandler = new RequestHandler();
         this.templater = new Templater();
+        this.merge = new Merge();
 
         this.sourceRank = []; 
         
@@ -208,17 +210,52 @@ export class Manga {
 
         return reorderedData;
     }   
-    /**
+    
     template(source = null, language = this.config.language) {
         //make vars
         let newInfo;
         let oldInfo;
-        //getold info
+
+        // getold info
         oldInfo = this.infoSourceHelper.getInfo(source, this.infoSources);
+
+        let rawID = 0;
+        let rawSource = "";
+
+        if (source !== null) {
+            let dashIndex = source.indexOf('-');
+            rawID = dashIndex !== -1 ? source.substring(dashIndex + 1) : source;
+            rawSource = dashIndex !== -1 ? source.substring(0, dashIndex) : source;
+        }
+
+
+        if (oldInfo == null) {
+            // no source
+            oldInfo = {
+                source : rawSource,
+                id : rawID,
+                link : ""
+            }
+        } 
 
         newInfo = this.templater.makeBaseTemplate(oldInfo);
         newInfo[language] = this.templater.makeLanguageTemplate(false, false, false);
+
+
+        // get index
+        let i = this.infoSourceHelper.getInfoIndex(source, this.infoSources);
+
+        let mergedinfo = this.merge.info(oldInfo, newInfo);
+
+        if (i == null) {
+            //source is new
+            this.infoSources.push(mergedinfo);
+            return null;
+        }
+        
+        this.infoSources[i] = mergedinfo;
+        return null;
+        
     }
-    */
 }
 

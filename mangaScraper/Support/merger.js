@@ -1,7 +1,7 @@
 export class Merge {
     info(oldDict, newDict) {
         // Helper function to recursively merge dictionaries
-        let defaults = [0, "", [], false];
+        let defaults = [0, "", [], false, null];
         function mergeRecursive(oldObj, newObj) {
             for (let key in newObj) {
                 if (newObj.hasOwnProperty(key)) {
