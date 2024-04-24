@@ -34,6 +34,21 @@ This function gets the value of item
 let titles = manga.get("title", "english");
 ```
 
+## Template
+```
+template(source = null, language)
+```
+
+Generates complete template over top a current source if source is null then it will make a whole new template.
+
+* source (String) - used as ID
+* language (String)- the language to make the template
+
+**example:** 
+```
+manga.template();
+```
+
 # Other
 ## Items
 Here is the full list of items you can input into the item argument:
@@ -65,3 +80,36 @@ Here is the full list of items you can input into the item argument:
  - pictureLinksExpire
 
 ## Customizable defaults
+These values set the defaults for values in functions it is designed to help avoid repetitive code.
+
+#### Example
+instead of...
+```
+// do things
+await manga.update(["pictureLinks","title"], "english", 0);
+
+let titles = manga.get("title", "english", 0);
+let pictureLinks = manga.get("pictureLinks", "englsih", 0);
+```
+you can do this...
+```
+//set config
+manga.config.language = "english";
+manga.config.chapter = 0;
+
+//do things
+await manga.update(["pictureLinks","title"]);
+
+let titles = manga.get("title");
+let pictureLinks = manga.get("pictureLinks");
+```
+
+#### Usage
+To use this you need to call className.config.varableName 
+
+Here is a full list of the varableNames and there defaults
+ - language : null
+ - chapter : 0
+ - maxParallelRequests : 2
+ - outputAll : false
+ - outputSource : false

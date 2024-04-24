@@ -4,7 +4,6 @@ import { MangaSearch, Manga } from './mangaScraper/mangaScraper.js';
 
 let manga = new Manga();
 
-
 //set config
 manga.config.language = "english";
 manga.config.chapter = 1;

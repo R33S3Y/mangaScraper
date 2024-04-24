@@ -35,41 +35,11 @@ let manga = new Manga();
 Next you will want to define the core variables as shown in this example:
 ```
 manga.sourceRank = [["mangatoto-103606"]];
+manga.template();
 
-
-manga.infoSources = [{
-
-source: "mangatoto",
-id: "103606",
-link: "https://mangatoto.com/series/103606/everything-s-coming-up-roses",
-authors: [],
-artists: [],
-genres: [],
-originalLanguage: '',
-availableLanguages: ["English"],
-displayMethod: "",
-views: 0,
-rating: 0,
-totalReviews: 0,
-  
-english: {
-coverImage: "",
-coverImageExpire: false,
-title: "",
-subtitle: "",
-description: "",
-status: "",
-totalChapters: 0,
-chapterTitles: [],
-chapterUploader: [],
-chapterLength: [],
-chapterLinks: [],
-chapterLinksExpire: false,
-pictureLinks: [],
-pictureLinksExpire: false,
-}
-
-}];
+manga.infoSources[0].source = "mangatoto";
+manga.infoSources[0].id = "103606";
+manga.infoSources[0].link = "https://mangatoto.com/series/103606/everything-s-coming-up-roses";
 ```
 **Note:** We know this step makes it pretty pointless to use our API but we have plans to add thing's like template and search functions to make it easier.
 
