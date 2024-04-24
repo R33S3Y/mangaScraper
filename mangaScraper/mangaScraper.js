@@ -212,6 +212,14 @@ export class Manga {
     }   
     
     template(source = null, language = this.config.language) {
+        /**
+         * Generates complete template over top a current source
+         * @param {string} source - used as ID
+         * @param {string} language - the language to make the template
+         * 
+         * @example manga.template();
+         */
+
         //make vars
         let newInfo;
         let oldInfo;
@@ -250,11 +258,11 @@ export class Manga {
         if (i == null) {
             //source is new
             this.infoSources.push(mergedinfo);
-            return null;
+            return;
         }
         
         this.infoSources[i] = mergedinfo;
-        return null;
+        return;
         
     }
 }
