@@ -1,10 +1,9 @@
-
-
-//import { Templater, InputChecker, ParserHelpers }  from '../Support/fetcherSupport.js';
+// imports
 import { Templater } from '../Support/templater.js';
 import { InputChecker } from '../Support/inputChecker.js';
 import { ParserHelpers } from '../Support/parserHelpers.js';
 import { Merge } from '../Support/merger.js'
+import { Fetcher } from '../Support/fetcher.js';
 
 
 export class Mangatoto{
@@ -13,11 +12,58 @@ export class Mangatoto{
         this.inputChecker = new InputChecker();
         this.parserHelpers = new ParserHelpers();
         this.merge = new Merge();
+        this.fetcher = new Fetcher();
         this.source = "mangatoto"
     }
 
-    search(query){
+    async search(query){
+        //invalid input check
+        if (typeof query !== String) {
+            return null;
+        }
 
+        try {
+            let link = `https://mangatoto.com/v3x-search?word=${query}`
+            let html = await this.fetcher.site(link);
+            
+            if (html == null) {
+                return null;                
+            }
+
+            let rawResults = [];
+            let results = [];
+
+            // get rawResults
+            let allResults = html.querySelector('div[data-hk="0-0-2"].grid.grid-cols-1.gap-5.border-t.border-t-base-200.pt-5');
+            let childElements = Array.from(allResults.children);
+    
+            // Push each child element into the subElements array
+            childElements.forEach(function(childElement) {
+                rawResults.push(childElement);
+            });
+
+            if (rawResults == []) {
+                return null;
+            }
+            
+            for (let i = 0; i < rawResults.length; i++) {
+                let rawResult = rawResults[i];
+                
+                let info = this.templater.makeBaseTemplate();
+                info.source = this.source;
+
+                info.id
+                info.link
+                
+
+                
+            }
+
+
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
     }
 
     async info(info){
