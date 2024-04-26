@@ -3,7 +3,7 @@ export class LanguageFinder {
      * This support Lib is intended to help MangaScraper Have it's Languages allign with ISO 639-3
      */
     constructor() {
-        let mapping = {
+        this.mapping = {
             "Ghotuo":"aaa",
             "Alumu-Tesu":"aab",
             "Ari":"aac",

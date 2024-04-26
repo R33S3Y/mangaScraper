@@ -13,7 +13,7 @@ This function returns nothing. It just updates/checks that the item requested is
 
 **example:** 
 ```
-await manga.update(["pictureLinks","title"], "english", chapter);
+await manga.update(["pictureLinks","title"], "eng", chapter);
 ```
 
 ## Get
@@ -31,7 +31,7 @@ This function gets the value of item
 
 **example:** 
 ```
-let titles = manga.get("title", "english");
+let titles = manga.get("title", "eng");
 ```
 
 ## Template
@@ -86,15 +86,15 @@ These values set the defaults for values in functions it is designed to help avo
 instead of...
 ```
 // do things
-await manga.update(["pictureLinks","title"], "english", 0);
+await manga.update(["pictureLinks","title"], "eng", 0);
 
-let titles = manga.get("title", "english", 0);
-let pictureLinks = manga.get("pictureLinks", "englsih", 0);
+let titles = manga.get("title", "eng", 0);
+let pictureLinks = manga.get("pictureLinks", "eng", 0);
 ```
 you can do this...
 ```
 //set config
-manga.config.language = "english";
+manga.config.language = "eng";
 manga.config.chapter = 0;
 
 //do things

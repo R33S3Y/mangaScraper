@@ -4,6 +4,7 @@ import { InputChecker } from '../Support/inputChecker.js';
 import { ParserHelpers } from '../Support/parserHelpers.js';
 import { Merge } from '../Support/merger.js'
 import { Fetcher } from '../Support/fetcher.js';
+import { LanguageFinder } from '../Support/languageFinder.js';
 
 
 export class Mangatoto{
@@ -13,6 +14,7 @@ export class Mangatoto{
         this.parserHelpers = new ParserHelpers();
         this.merge = new Merge();
         this.fetcher = new Fetcher();
+        this.languageFinder = new LanguageFinder();
         this.source = "mangatoto"
     }
 
@@ -104,8 +106,8 @@ export class Mangatoto{
                 }
             }
 
-            // Remove case sensitivity
-            language = language.toLowerCase();
+            // Convert to ISO 639-3
+            language = this.languageFinder.nameToISO(language);
 
             // Check that language is not in the newInfo template
             for (const key in newInfo) {
