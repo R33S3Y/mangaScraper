@@ -1,8 +1,20 @@
 export class Merge {
     info(oldDict, newDict) {
+        /**
+         * Merges two dictionaries, preserving existing values from the old dictionary.
+         * @param {object} oldDict - The original dictionary.
+         * @param {object} newDict - The dictionary containing new values to merge.
+         * @returns {object} - The merged dictionary.
+         */
         // Helper function to recursively merge dictionaries
         let defaults = [0, "", [], false, null];
         function mergeRecursive(oldObj, newObj) {
+            /**
+             * Helper function to recursively merge dictionaries.
+             * @param {object} oldObj - The original object to merge into.
+             * @param {object} newObj - The new object containing values to merge.
+             * @returns {object} - The merged object.
+             */
             for (let key in newObj) {
                 if (newObj.hasOwnProperty(key)) {
                     if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key])) {

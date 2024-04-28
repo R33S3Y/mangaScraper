@@ -2,10 +2,17 @@
 export class Fetcher {
     async site(link) {
         /**
-         * Fetchs site amd returns parsed html or null if failed
-         * @param {String} link
+         * Fetches the content of a website and returns the parsed HTML document, or null if failed.
+         * @param {string} link - The URL of the website to fetch.
+         * @returns {Document|null} - The parsed HTML document of the website, or null if the fetch failed.
          * 
-         * @example let html = fetcher.site(link);
+         * @example
+         * const htmlDoc = await fetcher.site(link);
+         * if (htmlDoc) {
+         *     console.log("Website fetched successfully:", htmlDoc);
+         * } else {
+         *     console.error("Failed to fetch website:", link);
+         * }
          */
         let response = await fetch(link);
             
