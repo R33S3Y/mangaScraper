@@ -1,14 +1,15 @@
-
 export class InputChecker{
     infoInputCheck(info, source){
         /**
-         * Preforms the input checks most likely needed for the info function
+         * Performs input checks most likely needed for the info function.
+         * @param {object} info - The input object for the info function.
+         * @param {string} source - The source that this module handles.
+         * @returns {boolean} - False if input fails checks; otherwise, true.
          * 
-         * @param {dict} info - info function input
-         * @param {str} source - the source that this module handles
-         * @returns {bool} - false if it failed on checks else true
-         * 
-         * @example if (this.inputChecker.infoInputCheck(info, this.source) !== true) {return null;}
+         * @example
+         * if (!this.inputChecker.infoInputCheck(info, this.source)) {
+         *     return null;
+         * }
          */
         if (!info.source) {
             console.error(`Invalid input: ${source}.js needs info.source`);
@@ -30,15 +31,24 @@ export class InputChecker{
 
     pictureInputCheck(info, chapter, language, source){
         /**
-         * Preforms the input checks most likely needed for the info function
+         * Performs input checks most likely needed for the picture function.
+         * @param {object} info - Input object for the info function.
+         * @param {number} chapter - Input for the chapter function.
+         * @param {string} language - Input for the language function.
+         * @param {string} source - The source that this module handles.
+         * @returns {Array} - First item indicates if input fails checks (false) or passes (true); 
+         *                    second item indicates if calling the info function can fix the issue (true), otherwise false.
          * 
-         * @param {dict} info - info function input
-         * @param {int} chapter - chapter function input
-         * @param {str} language - language function input
-         * @param {str} source - the source that this module handles
-         * @returns {list} - 1st item false if it failed on checks else true second is for if a call info can fix the issue
-         * 
-         * @example let [checker, infoFix]  = this.inputChecker.pictureInputCheck(info, chapter, language, this.source);
+         * @example
+         * const [checker, infoFix] = this.inputChecker.pictureInputCheck(info, chapter, language, this.source);
+         * if (!checker) {
+         *     return null;
+         * }
+         * if (infoFix) {
+         *     // Call info function to fix the issue
+         *     const infoResult = this.getInfo(...);
+         *     // Handle infoResult...
+         * }
          */
         if (!info.source) {
             console.error(`Invalid input: ${source}.js needs info.source`);

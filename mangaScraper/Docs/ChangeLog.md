@@ -1,4 +1,7 @@
-# V0.3
+## V 0.3.1
+ - Added large amounts of in code documentation for the support functions.
+ - Did the documentation in the [Support functions](Support%20functions.md) document
+# V 0.3
  - Changed language to align with ISO 639-3
 # V 0.2
  - Added Documentation for previous content

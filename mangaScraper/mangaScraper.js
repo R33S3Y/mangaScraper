@@ -30,7 +30,8 @@ export class Manga {
 
             // Get
             outputAll : false,
-            outputSource : false
+            outputSource : false,
+            fallbackLanguage : true
         }
         // INFO
         
@@ -168,7 +169,7 @@ export class Manga {
         }
     }
 
-    get(item, language = this.config.language, chapter = this.config.chapter, outputAll = this.config.outputAll, outputSource = this.config.outputSource) {
+    get(item, language = this.config.language, chapter = this.config.chapter, outputAll = this.config.outputAll, outputSource = this.config.outputSource, fallbackLanguage = this.config.fallbackLanguage) {
         /**
          * Gets/returns the value of the item requested
          * @param {string} item - name of the item you want to get
@@ -181,7 +182,7 @@ export class Manga {
          */
 
         //get all info
-        let hold = this.infoSourceHelper.getItems(item, language, chapter, this.infoSources);
+        let hold = this.infoSourceHelper.getItems(item, language, chapter, this.infoSources, fallbackLanguage);
         
         //sort data
         let flatSourceRank = this.sourceRank.reduce((acc, curr) => {

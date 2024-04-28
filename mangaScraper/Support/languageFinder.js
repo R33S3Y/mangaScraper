@@ -7928,10 +7928,20 @@ export class LanguageFinder {
     }
 
     nameToISO(name){
+        /**
+         * Converts a language name to its corresponding ISO 639-3 code.
+         * @param {string} name - The name of the language.
+         * @returns {string|null} - The ISO 639-3 code corresponding to the language name, or null if not found.
+         */
         return this.mapping[name]
     }
 
     ISOToName(ISO){
+        /**
+         * Converts an ISO 639-3 code to its corresponding language name.
+         * @param {string} ISO - The ISO 639-3 code.
+         * @returns {string|null} - The language name corresponding to the ISO 639-3 code, or null if not found.
+         */
         return Object.keys(this.mapping).find(key => this.mapping[key] === ISO);
     }
 }
