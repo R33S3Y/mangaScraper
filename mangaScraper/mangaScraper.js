@@ -31,7 +31,9 @@ export class Manga {
             // Get
             outputAll : false,
             outputSource : false,
-            fallbackLanguage : true
+            fallbackLanguage : true,
+            alwaysOutput : true,
+            justChapter : false
         }
         // INFO
         
@@ -169,20 +171,26 @@ export class Manga {
         }
     }
 
-    get(item, language = this.config.language, chapter = this.config.chapter, outputAll = this.config.outputAll, outputSource = this.config.outputSource, fallbackLanguage = this.config.fallbackLanguage) {
+    get(item, language = this.config.language, chapter = this.config.chapter, outputAll = this.config.outputAll,
+        outputSource = this.config.outputSource, fallbackLanguage = this.config.fallbackLanguage, 
+        alwaysOutput = this.config.alwaysOutput, justChapter = this.config.justChapter) {
         /**
-         * Gets/returns the value of the item requested
-         * @param {string} item - name of the item you want to get
-         * @param {string} language - the language of the info you want
-         * @param {Int} chapter - what chapter do you want the info from.
-         * @param {boolean} outputAll - if true function will output a list of all values
-         * @param {boolean} outputSource - if true function will output dicts containg item and id
-         * 
-         * @example let pictureLinks = Manga.get("pictureLinks", "english", chapter);
+         * Retrieves information for the specified item from manga sources.
+         * @param {string} item - The name of the item to retrieve.
+         * @param {string} language - The language of the information.
+         * @param {number} [chapter=0] - The chapter number to retrieve information from.
+         * @param {boolean} [outputAll=false] - If true, outputs a list of all values.
+         * @param {boolean} [outputSource=false] - If true, outputs dictionaries containing item and id.
+         * @param {boolean} [fallbackLanguage=true] - If true, falls back to default language when requested language info is not available.
+         * @param {boolean} [alwaysOutput=true] - If true, always outputs information, even if it's empty.
+         * @param {boolean} [justChapter=false] - If true, retrieves information for just the specified chapter.
+         * @returns {*} The retrieved information.
+         * @example
+         * let pictureLinks = Manga.get("pictureLinks", "english", chapter);
          */
 
         //get all info
-        let hold = this.infoSourceHelper.getItems(item, language, chapter, this.infoSources, fallbackLanguage);
+        let hold = this.infoSourceHelper.getItems(item, language, chapter, this.infoSources, fallbackLanguage, alwaysOutput, justChapter);
         
         //sort data
         let flatSourceRank = this.sourceRank.reduce((acc, curr) => {

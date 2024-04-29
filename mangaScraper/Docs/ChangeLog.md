@@ -1,4 +1,8 @@
+## V 0.3.2
+ - Added info about features that were added in 0.3.1 but I forgot to include in documetion for.
 ## V 0.3.1
+ - Added the fallbackLanguage flag to the get function. See:
+ - Added the fallbackLanguage, alwaysOutput & justChapter flags to the getItems function in InfoSourceHelper
  - Added large amounts of in code documentation for the support functions.
  - Did the documentation in the [Support functions](Support%20functions.md) document
 # V 0.3
