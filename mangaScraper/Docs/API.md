@@ -16,24 +16,31 @@ This function returns nothing. It just updates/checks that the item requested is
 await manga.update(["pictureLinks","title"], "eng", chapter);
 ```
 
-## Get
+## get
 ```
-get(item, language, chapter = 0, outputAll = false, outputSource = false)
+get(item, language = "", chapter = 0, outputAll = false, outputSource = false, fallbackLanguage = true, alwaysOutput = true, justChapter = false)
 ```
+The `get` method in the `Manga` class retrieves information for the specified item from manga sources.
 
-This function gets the value of item
+## Parameters:
+- `item` (string): The name of the item to retrieve.
+- `language` (string): The language of the information.
+- `chapter` (number, optional, default: 0): The chapter number to retrieve information from.
+- `outputAll` (boolean, optional, default: false): If true, outputs a list of all values.
+- `outputSource` (boolean, optional, default: false): If true, outputs dictionaries containing item and id.
+- `fallbackLanguage` (boolean, optional, default: true): If true, falls back to the default language when requested language information is not available.
+- `alwaysOutput` (boolean, optional, default: true): If true, always outputs information, even if it's empty.
+- `justChapter` (boolean, optional, default: false): If true, retrieves information for just the specified chapter.
 
-- item (String) - string of names of the item you want to get. You can see the full Iist of items [here](API.md##Items).
-- language (String) - the language of the info you want the items in. (Should be lowercase)
-- chapter (Int) - what chapter do you want the info from.
-- outputAll (Boolean) - if true function will output a list of all values as appose to just a single value to a item
-- outputSource (Boolean) - if true function will output dicts containg item and id
+## Returns:
+- `*`: The retrieved information.
 
-**example:** 
+## Example:
 ```
-let titles = manga.get("title", "eng");
+const pictureLinks = manga.get("pictureLinks", "english", chapter);
+console.log(pictureLinks);
 ```
-
+This method retrieves information for the specified item from manga sources based on the provided parameters. It first fetches all information for the item, sorts the data based on the source ranking, and then applies filtering based on the `outputAll` and `outputSource` parameters. Finally, it returns the retrieved information in the specified format.
 ## Template
 ```
 template(source = null, language)
