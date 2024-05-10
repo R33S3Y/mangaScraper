@@ -1,8 +1,9 @@
 
 import { MangaSearch, Manga } from './mangaScraper/mangaScraper.js';
-
+import { Mangatoto } from './mangaScraper/Fetchers/mangatoto.js';
 
 let manga = new Manga();
+let mangatoto = new Mangatoto();
 
 //set config
 manga.config.language = "eng";
@@ -27,3 +28,5 @@ p.innerHTML = titles;
 
 let img = document.getElementById("2");
 img.src = pictureLinks[1][0];
+
+console.log(await mangatoto.search("hi"));

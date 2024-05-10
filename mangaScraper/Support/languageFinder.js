@@ -7933,7 +7933,7 @@ export class LanguageFinder {
          * @param {string} name - The name of the language.
          * @returns {string|null} - The ISO 639-3 code corresponding to the language name, or null if not found.
          */
-        return this.mapping[name]
+        return this.mapping[name];
     }
 
     ISOToName(ISO){
