@@ -15,17 +15,19 @@ export class Mangatoto{
         this.merge = new Merge();
         this.fetcher = new Fetcher();
         this.languageFinder = new LanguageFinder();
-        this.source = "mangatoto"
+        this.source = "mangatoto";
     }
 
-    async search(query){
+    async search(query, askRound = 0){
         //invalid input check
-        if (typeof query !== String) {
+        if (typeof query !== 'string') {
             return null;
         }
+        askRound++;
+        query = query.replace(" ", "+");
 
         try {
-            let link = `https://mangatoto.com/v3x-search?word=${query}`
+            let link = `https://mangatoto.com/search?word=${query}&page=${askRound}`
             let html = await this.fetcher.site(link);
             
             if (html == null) {
@@ -36,7 +38,7 @@ export class Mangatoto{
             let results = [];
 
             // get rawResults
-            let allResults = html.querySelector('div[data-hk="0-0-2"].grid.grid-cols-1.gap-5.border-t.border-t-base-200.pt-5');
+            let allResults = html.querySelector('#series-list');
             let childElements = Array.from(allResults.children);
     
             // Push each child element into the subElements array
@@ -49,19 +51,60 @@ export class Mangatoto{
             }
             
             for (let i = 0; i < rawResults.length; i++) {
-                let rawResult = rawResults[i];
+                let doc = rawResults[i];
                 
-                let info = this.templater.makeBaseTemplate();
+                // make template
+                let info;
+                info = this.templater.makeBaseTemplate();
+                info.fallBack = this.templater.makeLanguageTemplate();
+
+                // source
                 info.source = this.source;
 
-                info.id
-                info.link
-                
+                let imga = doc.querySelector(".item-cover");
+                let img = imga.querySelector("img");
+
+
+                // link
+                info.link = `mangatoto.com${imga.href.replace(/^(.*\/series\/)/, '/series/')}`;
+                // id
+                info.id = imga.href.match(/\/series\/(\d+)\//)[1];
 
                 
+
+                // nice to have
+                info.fallBack.title = doc.querySelector(".item-title").textContent.trim();
+                info.fallBack.coverImage = img.src;
+
+                let textdivs = doc.querySelectorAll(".item-text > .item-alias");
+                if (textdivs.length != 0) {
+                    info.fallBack.subtitle = textdivs[0].querySelector(".text-muted").textContent.trim();;
+                    if (textdivs.length > 1) {
+                        let parts = textdivs[1].querySelectorAll(".text-muted");
+
+                        let author = parts[0].textContent.trim();
+                        let artist = parts[1] ? parts[1].textContent.trim() : "";
+
+                        if (author !== "") {
+                            info.authors = [{ name : author}];
+                        }
+                        if (artist !== "") {
+                            info.artists = [{ name : artist}];
+                        }
+                    }
+                } else {
+                    console.debug("no subtitle or artist info for:");
+                    console.debug(doc);
+                }
+                let genresSpans = doc.querySelectorAll(".item-genre > span, u");
+                for (let genreSpan of genresSpans) {
+                    info.genres.push(genreSpan.textContent.trim());
+                }
+
+                results.push(info);
             }
 
-
+            return results;
         } catch (error) {
             console.error('Error:', error);
             return null;
@@ -79,16 +122,7 @@ export class Mangatoto{
 
         try {
             // Get website
-            const response = await fetch(info.link);
-            
-            if (!response.ok) {
-                console.error(`Couldn't access ${info.link} status code: ${response.status}`);
-                return null;
-            }
-
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html', { contentType: 'text/html', scripting: 'disabled' });
+            const doc = await this.fetcher.site(info.link);
 
             // Figure out what language the manga is in.
             let language;
@@ -276,8 +310,9 @@ export class Mangatoto{
                 // Function is still useful if chapters info can't be found
             }
             
-            console.debug(newInfo);
-            return this.merge.info(info, newInfo);
+            let mergedInfo = this.merge.info(info, newInfo);
+            console.debug(mergedInfo);
+            return mergedInfo;
         } catch (error) {
             console.error('Error:', error);
             return null;
@@ -307,17 +342,9 @@ export class Mangatoto{
 
         try {
             // Get website
-            const response = await fetch(info[language].chapterLinks[chapter]);
-            
-            if (!response.ok) {
-                console.error(`Couldn't access ${info[language].chapterLinks[chapter]} status code: ${response.status}`);
-                return null;
-            }
-    
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
+            const doc = await this.fetcher.site(info[language].chapterLinks[chapter]);
+
+
             try {
                 // Get picture info
                 const pictureInfoElement = this.parserHelpers.findElementBySubtext(doc.querySelectorAll('script'), 'const your_email = ');
@@ -354,8 +381,9 @@ export class Mangatoto{
                 console.warn(`Can't find pictureInfo info at ${info[language].chapterLinks[chapter]} ERROR: ${error}`);
             }
 
-            console.debug(newInfo);
-            return this.merge.info(info, newInfo);
+            let mergedInfo = this.merge.info(info, newInfo);
+            console.debug(mergedInfo);
+            return mergedInfo;
         } catch (error) {
             console.error('Error:', error);
             return null;
