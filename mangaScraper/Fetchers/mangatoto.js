@@ -15,6 +15,7 @@ export class Mangatoto{
         this.merge = new Merge();
         this.fetcher = new Fetcher();
         this.languageFinder = new LanguageFinder();
+        
         this.source = "mangatoto";
     }
 
