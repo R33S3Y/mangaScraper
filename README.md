@@ -4,7 +4,7 @@
 MangaScraper is still in early development and has not been thoroughly tested. Expect bugs, issues and missing features while it in it's current state. 
 
 ## Summary
-MangaScraper is a library designed to handle the collection and standardization of data between multiple sources, hiding everything behind a API. It is intended for use on a client side web browser.
+MangaScraper is a library designed to handle the collection and standardization of manga between multiple sources, hiding everything behind a API. It is intended for use on a client side web browser.
 
 ## Sources
 MangaScraper currently supports the collection of info from:

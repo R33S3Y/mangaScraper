@@ -1,3 +1,8 @@
+## V 0.3.4
+ - Removed the file mangaScraperBackend.js via storing RequestHandler in mangascraper.js directly
+ - Updated fetcherTemplate.js to better reflect how devs should a sites
+ - Updated documentation to reflect change
+ - Minor readme change
 ## V 0.3.3
  - Added the functionalty to mangatoto.search() for testing and building up the rest of the search API
  - Changed mangatoto to use Fetcher.site() to requset websites

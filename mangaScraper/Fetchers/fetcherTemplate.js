@@ -5,7 +5,8 @@
 //import { Templater, InputChecker, ParserHelpers }  from '../Support/fetcherSupport.js';
 import { Templater } from '../Support/templater.js';
 import { InputChecker } from '../Support/inputChecker.js';
-import { Merge } from '../Support/merger.js'
+import { Merge } from '../Support/merger.js';
+import { Fetcher } from '../Support/fetcher.js';
 
 
 export class Example{ // Your classname
@@ -13,8 +14,9 @@ export class Example{ // Your classname
         this.templater = new Templater();
         this.inputChecker = new InputChecker();
         this.merge = new Merge();
+        this.fetcher = new Fetcher();
         
-        this.source = "example" // Your sourcename
+        this.source = "example"; // Your sourcename
     }
 
     search(query){ //Will be added at a later time
@@ -32,22 +34,13 @@ export class Example{ // Your classname
 
         try {
             // Get website
-            const response = await fetch(info.link);
-            
-            if (!response.ok) {
-                console.error(`Couldn't access ${info.link} status code: ${response.status}`);
-                return null;
-            }
-
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html', { contentType: 'text/html', scripting: 'disabled' });
+            const doc = await this.fetcher.site(info.link);
 
             // Figure out what language the manga is in.
             let language = "example"; // Add your implementation here
             
-
-
+            // the langauge should be formated according to ISO 639-3
+            // you can use languageFinder.js to help with this.
 
 
 
@@ -234,16 +227,7 @@ export class Example{ // Your classname
 
         try {
             // Get website
-            const response = await fetch(info[language].chapterLinks[chapter]);
-            
-            if (!response.ok) {
-                console.error(`Couldn't access ${info[language].chapterLinks[chapter]} status code: ${response.status}`);
-                return null;
-            }
-    
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
+            const doc = await this.fetcher.site(info[language].chapterLinks[chapter]);
             
             try {
                 // Get picture info
