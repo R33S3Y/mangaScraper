@@ -43,19 +43,23 @@ export class Manga {
         
         // Config stores all default function params
         this.config = {
-            // Genric
-            language : null,
-            chapter : 0,
+            // Manga
+             // all
+             language : null,
+             chapter : 0,
+             // get()
+             outputAll : false,
+             outputSource : false,
+            
+            // RequestHandler
+             // orderRequests()
+             maxParallelRequests : 2,
 
-            // Update
-            maxParallelRequests : 2,
-
-            // Get
-            outputAll : false,
-            outputSource : false,
-            fallbackLanguage : true,
-            alwaysOutput : true,
-            justChapter : false
+            // InfoSourceHelper
+             // getItems
+             fallbackLanguage : true,
+             alwaysOutput : true,
+             justChapter : false
         }
         this.updateConfig();
         // INFO
@@ -113,7 +117,7 @@ export class Manga {
         return;
     }
 
-    async update(items, language = this.config.language, chapter = this.config.chapter, maxParallelRequests = this.config.maxParallelRequests) {
+    async update(items, language = this.config.language, chapter = this.config.chapter) {
         /**
          * returns nothing. Just updates the value of the item requested
          * @param {Array} item - list of names of the items you want to get update
@@ -172,24 +176,7 @@ export class Manga {
                  * This is intentional although I may add a flag/setting to merge.
                  */
 
-                let rawRequestOrder = JSON.parse(JSON.stringify(this.sourceRank)); // This is done to make a deep copy of sourceRank
-                let requestOrder = [];
-
-                for (let rank of rawRequestOrder) {
-
-                    let requestItem = [];
-                    while(rank.length !== 0){
-
-                        if (requestItem.length >= maxParallelRequests) {
-                            requestOrder.push(requestItem);
-                            requestItem = [];
-                        }
-                        requestItem.push(rank[0]);
-                        rank.shift()
-                    }
-
-                    requestOrder.push(requestItem);
-                }
+                let requestOrder = this.requesthandler.orderRequests(this.sourceRank);
 
                 //Make request
                 for (let requestGroup of requestOrder) {

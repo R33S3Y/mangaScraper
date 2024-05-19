@@ -65,7 +65,8 @@ export class InfoSourceHelper{
         return vaildItems.length;
     }
 
-    getItems(item, language = null, chapter = null, infoSources, fallbackLanguage = false, alwaysOutput = true, justChapter = false, calledInternally = false){
+    getItems(item, language = null, chapter = null, infoSources, fallbackLanguage = this.config.fallbackLanguage, 
+        alwaysOutput = this.config.alwaysOutput, justChapter = this.config.justChapter, calledInternally = false){
         /**
          * Retrieves items from information sources based on specified criteria.
          * @param {string} item - The type of item to retrieve.
