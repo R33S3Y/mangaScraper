@@ -1,4 +1,5 @@
 # V 0.4
+ - Added a function to all classes called updateConfig()
  - Renamed functions in RequestHandler
 ## V 0.3.4
  - Removed the file mangaScraperBackend.js via storing RequestHandler in mangascraper.js directly

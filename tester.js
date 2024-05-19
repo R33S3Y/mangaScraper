@@ -6,8 +6,10 @@ let manga = new Manga();
 let mangatoto = new Mangatoto();
 
 //set config
-manga.config.language = "eng";
-manga.config.chapter = 1;
+manga.updateConfig({
+    language : "eng",
+    chapter: 1
+});
 
 //make vars
 manga.sourceRank = [["mangatoto-103606"]];

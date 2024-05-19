@@ -1,4 +1,12 @@
 export class InputChecker{
+    constructor() {
+        this.config = {};
+    }
+    updateConfig(config) {
+        this.config = config;
+        return;
+    }
+
     infoInputCheck(info, source){
         /**
          * Performs input checks most likely needed for the info function.

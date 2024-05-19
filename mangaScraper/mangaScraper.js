@@ -17,6 +17,16 @@ export class MangaSearch {
             askRound : 0
         }
     }
+
+    updateConfig(config = {}) {
+        config = this.merge.info(this.config, config);
+
+        this.config = config;
+        
+        this.requesthandler.updateConfig(config);
+        return;
+    }
+
     static search(query, askRound = this.config.askRound, callback) {
         // Implement MangaSearch search method if needed
     }
@@ -47,6 +57,7 @@ export class Manga {
             alwaysOutput : true,
             justChapter : false
         }
+        this.updateConfig();
         // INFO
         
         this.infoSources = [];
@@ -89,7 +100,18 @@ export class Manga {
          *     ]
          */
     }
+    
+    updateConfig(config = {}) {
+        config = this.merge.info(this.config, config);
 
+        this.config = config;
+
+        this.infoSourceHelper.updateConfig(config);
+        this.requesthandler.updateConfig(config);
+        this.templater.updateConfig(config);
+        this.merge.updateConfig(config);
+        return;
+    }
 
     async update(items, language = this.config.language, chapter = this.config.chapter, maxParallelRequests = this.config.maxParallelRequests) {
         /**
@@ -295,6 +317,16 @@ class RequestHandler{
         // Fetchers
         this.mangatoto = new Mangatoto();
 
+        this.config = {};
+    }
+
+    updateConfig(config) {
+        config = JSON.parse(JSON.stringify(config));
+
+        this.config = config;
+
+        this.mangatoto.updateConfig(config);
+        return;
     }
 
     orderRequests(sourceRank) {
@@ -306,7 +338,7 @@ class RequestHandler{
             let requestItem = [];
             while(rank.length !== 0){
 
-                if (requestItem.length >= maxParallelRequests) {
+                if (requestItem.length >= this.config.maxParallelRequests) {
                     requestOrder.push(requestItem);
                     requestItem = [];
                 }

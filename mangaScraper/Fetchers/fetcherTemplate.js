@@ -17,8 +17,21 @@ export class Example{ // Your classname
         this.fetcher = new Fetcher();
         
         this.source = "example"; // Your sourcename
+
+        this.config = {};
     }
 
+    updateConfig(config) {
+        config = JSON.parse(JSON.stringify(config));
+
+        this.config = config;
+
+        this.templater.updateConfig(config);
+        this.inputChecker.updateConfig(config);
+        this.merge.updateConfig(config);
+        this.fetcher.updateConfig(config);
+        return;
+    }
     search(query){ //Will be added at a later time
 
     }

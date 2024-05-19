@@ -1,4 +1,12 @@
 export class InfoSourceHelper{
+    constructor() {
+        this.config = {};
+    }
+    updateConfig(config) {
+        this.config = config;
+        return;
+    }
+
     countItem(item, language = null, chapter = null, infoSources, calledInternally = false){
         /**
          * Counts the occurrences of a specified item within information sources.
