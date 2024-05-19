@@ -1,3 +1,9 @@
+# V 0.4
+ - Added the updateConfig function ([Documentation here](API.md##UpdateConfig)) to replace customizable defaults added in V0.1.4
+ - Added a function to all classes called updateConfig()
+ - Added orderRequests() to RequestHandler
+ - Added Documention for the new changes
+ - Renamed functions in RequestHandler
 ## V 0.3.4
  - Removed the file mangaScraperBackend.js via storing RequestHandler in mangascraper.js directly
  - Updated fetcherTemplate.js to better reflect how devs should a sites
@@ -29,5 +35,5 @@
  - Increased input checking/error handling on backend/support functions
 ## V 0.1.4
  - Change Log Added
- - Added customizable defaults ([Documentation here](API.md##Customizable%20defaults))
+ - Added customizable defaults ([Documentation here](API.md##Config%20/%20Customizable%20defaults))
  - Changed Langauge to Language

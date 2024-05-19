@@ -7925,6 +7925,12 @@ export class LanguageFinder {
             "Zaza":"zza",
             "Zuojiang Zhuang":"zzj",
         }
+
+        this.config = {}
+    }
+    updateConfig(config) {
+        this.config = config
+        return
     }
 
     nameToISO(name){

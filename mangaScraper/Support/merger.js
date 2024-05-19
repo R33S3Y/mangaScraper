@@ -1,4 +1,12 @@
 export class Merge {
+    constructor() {
+        this.config = {};
+    }
+    updateConfig(config) {
+        this.config = config;
+        return;
+    }
+
     info(oldDict, newDict) {
         /**
          * Merges two dictionaries, preserving existing values from the old dictionary.

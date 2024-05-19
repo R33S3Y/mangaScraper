@@ -1,5 +1,13 @@
 
 export class Templater{
+    constructor() {
+        this.config = {};
+    }
+    updateConfig(config) {
+        this.config = config;
+        return;
+    }
+
     makeBaseTemplate(info = null){
         /**
          * Makes the base template for manga information.

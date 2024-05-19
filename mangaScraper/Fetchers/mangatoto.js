@@ -17,6 +17,22 @@ export class Mangatoto{
         this.languageFinder = new LanguageFinder();
         
         this.source = "mangatoto";
+
+        this.config = {};
+    }
+
+    updateConfig(config) {
+        config = JSON.parse(JSON.stringify(config));
+
+        this.config = config;
+
+        this.templater.updateConfig(config);
+        this.inputChecker.updateConfig(config);
+        this.parserHelpers.updateConfig(config);
+        this.merge.updateConfig(config);
+        this.fetcher.updateConfig(config);
+        this.languageFinder.updateConfig(config);
+        return;
     }
 
     async search(query, askRound = 0){

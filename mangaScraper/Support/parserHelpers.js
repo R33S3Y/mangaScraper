@@ -1,5 +1,13 @@
 
 export class ParserHelpers{
+    constructor() {
+        this.config = {};
+    }
+    updateConfig(config) {
+        this.config = config;
+        return;
+    }
+
     findElementByText(elements, text) {
         /**
          * Finds an element within a collection based on its text content.
