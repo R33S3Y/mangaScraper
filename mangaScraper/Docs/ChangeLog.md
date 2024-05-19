@@ -1,3 +1,5 @@
+# V 0.4
+ - Renamed functions in RequestHandler
 ## V 0.3.4
  - Removed the file mangaScraperBackend.js via storing RequestHandler in mangascraper.js directly
  - Updated fetcherTemplate.js to better reflect how devs should a sites

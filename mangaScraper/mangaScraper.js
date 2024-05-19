@@ -8,7 +8,16 @@ import { Mangatoto }  from './Fetchers/mangatoto.js';
 
 
 export class MangaSearch {
-    static search() {
+    constructor() {
+
+        this.requesthandler = new RequestHandler();
+
+        this.config = {
+
+            askRound : 0
+        }
+    }
+    static search(query, askRound = this.config.askRound, callback) {
         // Implement MangaSearch search method if needed
     }
 }
@@ -162,7 +171,7 @@ export class Manga {
 
                 //Make request
                 for (let requestGroup of requestOrder) {
-                    let parallelRequestsOut = await this.requesthandler.parallelizeRequests(item, language, chapter, requestGroup, this.infoSources);
+                    let parallelRequestsOut = await this.requesthandler.parallelizeUpdateRequests(item, language, chapter, requestGroup, this.infoSources);
                     if (parallelRequestsOut !== null) {
                         this.infoSources = parallelRequestsOut;
                         if (this.infoSourceHelper.countItem(item, language, chapter, this.infoSources) !== 0) {
@@ -287,13 +296,35 @@ class RequestHandler{
         this.mangatoto = new Mangatoto();
 
     }
-    async distributeRequest(item, language, chapter, source, info) {
-        // Stage 0 create useful vars
+
+    orderRequests(sourceRank) {
+        let rawRequestOrder = JSON.parse(JSON.stringify(sourceRank)); // This is done to make a deep copy of sourceRank
+        let requestOrder = [];
+
+        for (let rank of rawRequestOrder) {
+
+            let requestItem = [];
+            while(rank.length !== 0){
+
+                if (requestItem.length >= maxParallelRequests) {
+                    requestOrder.push(requestItem);
+                    requestItem = [];
+                }
+                requestItem.push(rank[0]);
+                rank.shift()
+            }
+
+            requestOrder.push(requestItem);
+        }
+        return requestOrder;
+    }
+
+
+    async distributeUpdateRequest(item, language, chapter, source, info) {
+        // Create useful vars
         let dashIndex = source.indexOf('-');
         let rawID = dashIndex !== -1 ? source.substring(dashIndex + 1) : source;
         let rawSource = dashIndex !== -1 ? source.substring(0, dashIndex) : source;
-
-        // Stage 1 call module functions
 
         // Mangatoto.js
         if (rawSource == this.mangatoto.source) {
@@ -313,7 +344,28 @@ class RequestHandler{
         return info;
     }
 
-    async parallelizeRequests(item, language, chapter, requestGroup, infoSources) {
+    async distributeSearchRequest(query, askRound, source) {
+        // Stage 0 create useful vars
+        let dashIndex = source.indexOf('-');
+        let rawID = dashIndex !== -1 ? source.substring(dashIndex + 1) : source;
+        let rawSource = dashIndex !== -1 ? source.substring(0, dashIndex) : source;
+
+        let result;
+
+        // Mangatoto.js
+        if (rawSource == this.mangatoto.source) {
+            result = this.mangatoto.search(query, askRound);
+        }
+
+        // We throw error here to stop it from being added to 
+        if (result == null) {
+            throw new console.error("Variable 'result' cannot be null.");
+        }
+
+        return result;
+    }
+
+    async parallelizeUpdateRequests(item, language, chapter, requestGroup, infoSources) {
         if (!Array.isArray(requestGroup)) {
             console.error("Invallid Input: requestGroup is not list");
             return null;
@@ -328,7 +380,7 @@ class RequestHandler{
             const requestPromise = new Promise((resolve, reject) => {
                 // Make the request
                 let info = this.infoSourceHelper.getInfo(requestGroup[i], infoSources);
-                this.distributeRequest(item, language, chapter, requestGroup[i], info)
+                this.distributeUpdateRequest(item, language, chapter, requestGroup[i], info)
                     .then(response => {
                         resolvedRequests.push(requestGroup[i]);
                         resolve(response); // Resolve the promise with the response
