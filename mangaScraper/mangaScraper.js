@@ -14,8 +14,15 @@ export class MangaSearch {
 
         this.config = {
 
-            askRound : 0
+            askRound : 0,
+            maxParallelRequests : 2,
+            runCallbackOnError : false
+
         }
+
+        this.lastQuery = "";
+        this.allSources = ["mangatoto"];
+        this.availableSources = []; //eg: [{source: "mangatoto", askround = 0}]
     }
 
     updateConfig(config = {}) {
@@ -27,8 +34,52 @@ export class MangaSearch {
         return;
     }
 
-    static search(query, askRound = this.config.askRound, callback) {
-        // Implement MangaSearch search method if needed
+    async search(query, callback = null) {
+        
+        // error checking
+        if (typeof query !== "string" || query === "") {
+            return null;
+        }
+        if (typeof callback !== "function" && callback !== null) {
+            return null;
+        }
+
+        // figure out list of items to request limit to maxparrel
+        if (query !== this.lastQuery) {
+            // is new search
+            this.availableSources = []; //reset sources
+
+            for (let i of [...this.allSources]) {
+                this.availableSources.push({source : i, askRound : 0});
+            }
+        }
+
+        let promises = [];
+
+        // todo - make promises
+
+        if (callback === null) {
+            // todo make logic for make manga classes
+            return await Promise.allSettled(promises);
+        }
+
+        for (const promise of promises) {
+            try {
+                const result = await promise;
+                if (this.config.runCallbackOnError === true) {
+                    // todo make logic for make manga classes
+                    callback({ status: 'fulfilled', value: result });
+                } else {
+                    callback(result);
+                }
+            
+            } catch (error) {
+                if (this.config.runCallbackOnError === true) {
+                    callback({ status: 'rejected', reason: error });
+                }
+                console.error(error);
+            }
+        }
     }
 }
 
@@ -414,7 +465,7 @@ class RequestHandler{
     
         try {
             // Execute all promises in parallel
-            let responses = await Promise.all(parallelRequests);  // IS LIST OF LIST will need to handle better  - Fixed 6/4/24
+            let responses = await Promise.allSettled(parallelRequests);  // IS LIST OF LIST will need to handle better  - Fixed 6/4/24
             // responeses now acts as mini infoSources with the updated info
 
             // Filters out any requsts with error
