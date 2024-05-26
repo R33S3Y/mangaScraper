@@ -1,7 +1,7 @@
 # MangaScraper
 
 ## Notice
-MangaScraper is still in early development and has not been thoroughly tested. Expect bugs, issues and missing features while it in it's current state. 
+MangaScraper is now considered feature (enough) complete. I will continue to develop it as  We find bugs and issues but I will instead be focused mainly on other things (Like making a website to use it on). With that in mind please note that MangaScraper has not been thoroughly tested and that you will most likely find bugs and other such issues that you will  need to help fix (by making issues, pull requests and so on). 
 
 ## Summary
 MangaScraper is a library designed to handle the collection and standardization of manga between multiple sources, hiding everything behind a API. It is intended for use on a client side web browser.
@@ -20,7 +20,7 @@ You can see the change log [Here](mangaScraper/Docs/ChangeLog.md).
 ## Setup 
 To set up MangaScraper Just Import it into your JS as shown here:
 ```
-import { Manga } from './mangaScraper/mangaScraper.js';
+import { MangaSearch, Manga } from './mangaScraper/mangaScraper.js';
 ```
 **Note:** the script you import this to will need to be setup as a follows: 
 ```
@@ -41,7 +41,12 @@ manga.infoSources[0].source = "mangatoto";
 manga.infoSources[0].id = "103606";
 manga.infoSources[0].link = "https://mangatoto.com/series/103606/everything-s-coming-up-roses";
 ```
-**Note:** We know this step makes it pretty pointless to use our API but we have plans to add thing's like template and search functions to make it easier.
+**Or** you can search for manga. Eg:
+```
+let mangaSearch = new MangaSearch();
 
+// creates a list of manga classes already setup.
+let mangas = await mangaSearch.search("hi");
+```
 and that's it your ready to start using our API as shown [Here](mangaScraper/Docs/API.md).
 
