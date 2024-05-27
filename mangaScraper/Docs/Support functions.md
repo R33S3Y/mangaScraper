@@ -1,4 +1,4 @@
-This markdown document provides documentation for all the functions and files in the Support folder. It is broken up into classes and then the functions it's self. The file's in the Support folder are able to be imported anywhere in the project as they should be able to work fully with just the info input into the function.
+This markdown document provides documentation for all the functions and files in the Support folder. It is broken up into classes and then the functions it's self. The file's in the Support folder are able to be imported anywhere inside the project as they should be able to work fully without dependencies.
 
 - - - 
 # Fetcher

@@ -17,7 +17,8 @@ export class MangaSearch {
             askRound: 0,
             maxParallelRequests: 2,
             allowDoubleQuerying: true,
-            runCallbackOnError: false
+            runCallbackOnError: false,
+            language : null
         }
 
         this.lastQuery = "";
@@ -89,6 +90,7 @@ export class MangaSearch {
                 let manga = new Manga();
                 manga.sourceRank = [[`${item.source}-${item.id}`]];
                 manga.infoSources = [item];
+                manga.updateConfig({language : this.config.language});
                 result.push(manga);
             }
 

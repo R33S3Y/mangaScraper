@@ -31,10 +31,14 @@ p.innerHTML = titles;
 let img = document.getElementById("2");
 img.src = pictureLinks[1][0];
 
+mangaSearch.updateConfig({ language : "eng" });
+
 console.log(await mangaSearch.search("hi"));
 
-function test(input) {
-    console.log(input);
+function test(mangas) {
+    for (let manga of mangas) {
+        console.log(manga.get("title"));
+    }
     return;
 }
 
