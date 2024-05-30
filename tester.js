@@ -1,10 +1,9 @@
 
 import { MangaSearch, Manga } from './mangaScraper/mangaScraper.js';
-import { Mangatoto } from './mangaScraper/Fetchers/mangatoto.js';
 
 let mangaSearch = new MangaSearch();
 let manga = new Manga();
-let mangatoto = new Mangatoto();
+
 
 //set config
 manga.updateConfig({
@@ -32,22 +31,37 @@ p.innerHTML = titles;
 let img = document.getElementById("2");
 img.src = pictureLinks[1][0];
 
-mangaSearch.updateConfig({ language : "eng" });
+mangaSearch.updateConfig({ language : "eng", maxParallelRequests : 5 });
 
-//console.log(await mangaSearch.search("hi"));
+console.log(await mangaSearch.search("hi"));
 
 function test(mangas) {
+    let titles = [];
     for (let manga of mangas) {
-        console.log(manga.get("title"));
+        titles.push(manga.get("title"));
     }
+    console.log(titles);
     return;
 }
 
-//await mangaSearch.search("hi", test);
+await mangaSearch.search("hi", test);
 
-// mangaSearch.updateConfig({runCallbackOnError : true});
+mangaSearch.updateConfig({runCallbackOnError : true});
 
-//mangaSearch.search("hi", test);
+function testWithRunCallbackOnError(input) {
+    if (input.status === "fulfilled") {
+        let mangas = input.value;
+        let titles = [];
+        for (let manga of mangas) {
+            titles.push(manga.get("title"));
+        }
+        console.log(titles);
+    } else {
+        console.error(input.value);
+    }
+    return;
 
-console.log(await mangatoto.search("hi there", 12543));
-console.log(mangatoto.lastPageCount);
+}
+
+console.log("testWithRunCallbackOnError");
+mangaSearch.search("hi", testWithRunCallbackOnError);
