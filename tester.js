@@ -1,9 +1,10 @@
 
 import { MangaSearch, Manga } from './mangaScraper/mangaScraper.js';
+import { Mangatoto } from './mangaScraper/Fetchers/mangatoto.js';
 
 let mangaSearch = new MangaSearch();
 let manga = new Manga();
-
+let mangatoto = new Mangatoto();
 
 //set config
 manga.updateConfig({
@@ -33,7 +34,7 @@ img.src = pictureLinks[1][0];
 
 mangaSearch.updateConfig({ language : "eng" });
 
-console.log(await mangaSearch.search("hi"));
+//console.log(await mangaSearch.search("hi"));
 
 function test(mangas) {
     for (let manga of mangas) {
@@ -42,8 +43,11 @@ function test(mangas) {
     return;
 }
 
-await mangaSearch.search("hi", test);
+//await mangaSearch.search("hi", test);
 
-mangaSearch.updateConfig({runCallbackOnError : true});
+// mangaSearch.updateConfig({runCallbackOnError : true});
 
-mangaSearch.search("hi", test);
+//mangaSearch.search("hi", test);
+
+console.log(await mangatoto.search("hi there", 12543));
+console.log(mangatoto.lastPageCount);

@@ -19,6 +19,9 @@ export class Mangatoto{
         this.source = "mangatoto";
 
         this.config = {};
+
+        this.lastQuery = "";
+        this.lastPageCount = 100; // set as it is the max for mangatoto
     }
 
     updateConfig(config) {
@@ -43,12 +46,37 @@ export class Mangatoto{
         askRound++;
         query = query.replace(" ", "+");
 
+        if (query === this.lastQuery && askRound > this.lastPageCount) {
+            return [];
+        }
+        
+        this.lastQuery = query;
+
         try {
             let link = `https://mangatoto.com/search?word=${query}&page=${askRound}`
             let html = await this.fetcher.site(link);
             
             if (html == null) {
                 return null;                
+            }
+
+
+            
+            let pageLinks = html.querySelectorAll(".page-link");
+            let pageNum = []
+            for (let pageLink of pageLinks) {
+                let rawnum;
+                const match = pageLink.href.match(/[?&]page=(\d+)/);
+                if (match) {
+                    rawnum = match[1];
+                    if (!isNaN(rawnum)) {
+                        pageNum.push(parseInt(rawnum));
+                    }
+                }
+            }
+            this.lastPageCount = pageNum.sort(function(a, b){return b - a})[0];
+            if (askRound > this.lastPageCount) {
+                return [];
             }
 
             let rawResults = [];
