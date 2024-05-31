@@ -9,26 +9,136 @@ import { Mangatoto }  from './Fetchers/mangatoto.js';
 
 export class MangaSearch {
     constructor() {
-
+        this.merge = new Merge();
         this.requesthandler = new RequestHandler();
 
+        // Default configuration
         this.config = {
-
-            askRound : 0
+            askRound: 0,
+            maxParallelRequests: 2,
+            allowDoubleQuerying: true,
+            runCallbackOnError: false,
+            language : null
         }
+
+        this.lastQuery = "";
+        this.allSources = ["mangatoto"];
+        this.availableSources = []; // e.g., [{source: "mangatoto", askround: 0}]
     }
 
+    // Method to update the configuration
     updateConfig(config = {}) {
         config = this.merge.info(this.config, config);
 
         this.config = config;
         
+        this.merge.updateConfig(config);
         this.requesthandler.updateConfig(config);
         return;
     }
 
-    static search(query, askRound = this.config.askRound, callback) {
-        // Implement MangaSearch search method if needed
+    // Main search method
+    async search(query, callback = null) {
+        
+        // Error checking for query and callback
+        if (typeof query !== "string" || query === "") {
+            return null;
+        }
+        if (typeof callback !== "function" && callback !== null) {
+            return null;
+        }
+
+        // If the query is new, reset sources and update the last query
+        if (query !== this.lastQuery) {
+            this.availableSources = []; // Reset sources
+            this.lastQuery = query;
+            for (let i of [...this.allSources]) {
+                this.availableSources.push({ source: i, askRound: 0 });
+            }
+        }
+
+        // Function to get a group of requests based on max parallel requests
+        const getRequestGroup = (max) => {
+            this.availableSources.sort((a, b) => a.askRound - b.askRound);
+
+            let requestGroup = this.availableSources.slice(0, max);
+
+            for (let i = 0; i < requestGroup.length; i++) {
+                this.availableSources[i].askRound++;
+            }
+
+            return JSON.parse(JSON.stringify(requestGroup));
+        };
+
+        let requestGroup = getRequestGroup(this.config.maxParallelRequests);
+
+        // Allow double querying if enabled in the config
+        if (this.config.allowDoubleQuerying === true && requestGroup.length < this.config.maxParallelRequests) {
+            while (requestGroup.length < this.config.maxParallelRequests) {
+                requestGroup = requestGroup.concat(getRequestGroup(this.config.maxParallelRequests - requestGroup.length));
+            }
+        }
+
+        // Function to create Manga objects from the response
+        const makeMangaClass = (response, source) => {
+            if (response.length === 0) {
+                // Remove source if the response is empty
+                this.availableSources = this.availableSources.filter(item => item.source !== source);
+            }
+            let result = [];
+            for (let item of response) {
+                let manga = new Manga();
+                manga.sourceRank = [[`${item.source}-${item.id}`]];
+                manga.infoSources = [item];
+                manga.updateConfig({language : this.config.language});
+                result.push(manga);
+            }
+
+            return result;
+        }
+
+        // Create promises for each request in the request group
+        let promises = requestGroup.map((groupItem) => {
+            return this.requesthandler.distributeSearchRequest(query, groupItem.askRound, groupItem.source)
+                .then(response => [response, groupItem.source])
+                .catch(error => {
+                    if (this.config.runCallbackOnError) {
+                        return Promise.reject({ status: 'rejected', reason: error, source: groupItem.source });
+                    }
+                    return Promise.reject(error);
+                });
+        });
+
+        // If no callback is provided, return the results directly
+        if (callback === null) {
+            let settledPromises = await Promise.allSettled(promises);
+            let results = [];
+            settledPromises.forEach(p => {
+                if (p.status === "fulfilled") {
+                    results.push(...makeMangaClass(p.value[0], p.value[1]));
+                }
+            });
+            return results;
+        }
+
+        // If a callback is provided, handle the results and errors using the callback
+        for (const promise of promises) {
+            try {
+                const resolvedPromise = await promise;
+                let result = makeMangaClass(resolvedPromise[0], resolvedPromise[1]);
+
+                if (this.config.runCallbackOnError === true) {
+                    callback({ status: 'fulfilled', value: result });
+                } else {
+                    callback(result);
+                }
+            } catch (error) {
+                if (this.config.runCallbackOnError === true) {
+                    callback({ status: 'rejected', value: error });
+                }
+                console.error(error);
+            }
+        }
     }
 }
 
@@ -176,7 +286,7 @@ export class Manga {
                  * This is intentional although I may add a flag/setting to merge.
                  */
 
-                let requestOrder = this.requesthandler.orderRequests(this.sourceRank);
+                let requestOrder = this.requesthandler.orderUpdateRequests(this.sourceRank);
 
                 //Make request
                 for (let requestGroup of requestOrder) {
@@ -316,7 +426,7 @@ class RequestHandler{
         return;
     }
 
-    orderRequests(sourceRank) {
+    orderUpdateRequests(sourceRank) {
         let rawRequestOrder = JSON.parse(JSON.stringify(sourceRank)); // This is done to make a deep copy of sourceRank
         let requestOrder = [];
 
@@ -357,7 +467,7 @@ class RequestHandler{
 
         // We throw error here to stop it from being added to 
         if (info == null) {
-            throw new console.error("Variable 'info' cannot be null.");
+            console.error("Variable 'info' cannot be null.");
         }
 
         return info;
@@ -373,12 +483,12 @@ class RequestHandler{
 
         // Mangatoto.js
         if (rawSource == this.mangatoto.source) {
-            result = this.mangatoto.search(query, askRound);
+            result = await this.mangatoto.search(query, askRound);
         }
 
         // We throw error here to stop it from being added to 
         if (result == null) {
-            throw new console.error("Variable 'result' cannot be null.");
+            console.error("Variable 'result' cannot be null.");
         }
 
         return result;
@@ -414,8 +524,15 @@ class RequestHandler{
     
         try {
             // Execute all promises in parallel
-            let responses = await Promise.all(parallelRequests);  // IS LIST OF LIST will need to handle better  - Fixed 6/4/24
-            // responeses now acts as mini infoSources with the updated info
+            let rawResponses = await Promise.allSettled(parallelRequests);  // IS LIST OF LIST will need to handle better  - Fixed 6/4/24
+            
+            let responses = [];
+            for (let rawResponse of rawResponses) {
+                if (rawResponse.status === "fulfilled") {
+                    responses.push(rawResponse.value);
+                }
+            }
+            // responses now acts as mini infoSources with the updated info
 
             // Filters out any requsts with error
             for (let source of resolvedRequests) {

@@ -1,12 +1,46 @@
-# Functions
+We Provide two classes to use in our API Manga & MangaSearch. Here lies the documention for both.
+ - - -
+# MangaSearch Functions
+
+## Search
+```
+async search(query, callback = null);
+```
+This function returns a list of manga classes ready to go. When rerunning the same query it returns more results.
+
+### Parameters:
+ - `query` (String) - the thing you want to search for
+ - `Callback` (Function) - if passed through it will pass the results of promises as they are resolved else it will just resolve all and return them.
+### Returns:
+- A list of classes by default all though this can be modified with the runCallbackOnError config option
+
+### Example:
+```
+let mangaSearch = new MangaSearch();
+
+mangaSearch.updateConfig({ language : "eng" });
+
+// logs all the titles
+function logTitles(mangas) {
+	for (let manga of mangas) {
+		console.log(manga.get("title"));
+	}
+	return;
+}
+
+mangaSearch.search("hi", logTitles);
+```
+
+- - -
+# Manga Functions
 ## Update
 ```
-async update(items, language, chapter = 0)
+async update(items, language, chapter = 0);
 ```
 This function returns nothing. It just updates/checks that the item requested is there and is valid. If not it will make the necessary requests to update it.
 ### Parameters:
 - `items` (Array or String) - list or string of names of the item/items you want to get updated. You can see the full Iist of items [here](API.md##Items).
-- `language` (String) - the language of the info you want the items in. (Should be lowercase)
+- `language` (String) - the language of the info you want the items in. (Should be ISO 639-3)
 - `chapter` (Int) - what chapter do you want the info from.
 ### Returns:
 - Nothing
@@ -24,7 +58,7 @@ The `get` method in the `Manga` class retrieves information for the specified it
 
 ### Parameters:
 - `item` (string): The name of the item to retrieve. You can see the full Iist of items [here](API.md##Items).
-- `language` (string): The language of the information.
+- `language` (string): The language of the information. (Should be ISO 639-3)
 - `chapter` (number, optional, default: 0): The chapter number to retrieve information from.
 - `outputAll` (boolean, optional, default: false): If true, outputs a list of all values.
 - `outputSource` (boolean, optional, default: false): If true, outputs dictionaries containing item and id.
@@ -146,7 +180,7 @@ Here is a full list of the config options and there defaults and what they chang
  - chapter - 0 - [get()](API.md##get) & [update()](API.md##update) 
  - outputAll - false - [get()](API.md##get)
  - outputSource - false - [get()](API.md##get)
- - maxParallelRequests - 2 - how many requests can the function make in parallel
+ - maxParallelRequests - 2 - how many requests it make can the function make in parallel
  - fallbackLanguage - true - [get()](API.md##get)
  - alwaysOutput - true - [get()](API.md##get)
  - justChapter - false - [get()](API.md##get)

@@ -19,6 +19,9 @@ export class Mangatoto{
         this.source = "mangatoto";
 
         this.config = {};
+
+        this.lastQuery = "";
+        this.lastPageCount = 100; // set as it is the max for mangatoto
     }
 
     updateConfig(config) {
@@ -43,12 +46,37 @@ export class Mangatoto{
         askRound++;
         query = query.replace(" ", "+");
 
+        if (query === this.lastQuery && askRound > this.lastPageCount) {
+            return [];
+        }
+        
+        this.lastQuery = query;
+
         try {
             let link = `https://mangatoto.com/search?word=${query}&page=${askRound}`
             let html = await this.fetcher.site(link);
             
             if (html == null) {
                 return null;                
+            }
+
+
+            
+            let pageLinks = html.querySelectorAll(".page-link");
+            let pageNum = []
+            for (let pageLink of pageLinks) {
+                let rawnum;
+                const match = pageLink.href.match(/[?&]page=(\d+)/);
+                if (match) {
+                    rawnum = match[1];
+                    if (!isNaN(rawnum)) {
+                        pageNum.push(parseInt(rawnum));
+                    }
+                }
+            }
+            this.lastPageCount = pageNum.sort(function(a, b){return b - a})[0];
+            if (askRound > this.lastPageCount) {
+                return [];
             }
 
             let rawResults = [];
@@ -68,57 +96,61 @@ export class Mangatoto{
             }
             
             for (let i = 0; i < rawResults.length; i++) {
-                let doc = rawResults[i];
-                
-                // make template
-                let info;
-                info = this.templater.makeBaseTemplate();
-                info.fallBack = this.templater.makeLanguageTemplate();
+                try {
+                    let doc = rawResults[i];
+                    
+                    // make template
+                    let info;
+                    info = this.templater.makeBaseTemplate();
+                    info.fallBack = this.templater.makeLanguageTemplate();
 
-                // source
-                info.source = this.source;
+                    // source
+                    info.source = this.source;
 
-                let imga = doc.querySelector(".item-cover");
-                let img = imga.querySelector("img");
+                    let imga = doc.querySelector(".item-cover");
+                    let img = imga.querySelector("img");
 
 
-                // link
-                info.link = `mangatoto.com${imga.href.replace(/^(.*\/series\/)/, '/series/')}`;
-                // id
-                info.id = imga.href.match(/\/series\/(\d+)\//)[1];
+                    // link
+                    info.link = `mangatoto.com${imga.href.replace(/^(.*\/series\/)/, '/series/')}`;
+                    // id
+                    info.id = imga.href.match(/\/series\/(\d+)\//)[1];
 
-                
+                    
 
-                // nice to have
-                info.fallBack.title = doc.querySelector(".item-title").textContent.trim();
-                info.fallBack.coverImage = img.src;
+                    // nice to have
+                    info.fallBack.title = doc.querySelector(".item-title").textContent.trim();
+                    info.fallBack.coverImage = img.src;
 
-                let textdivs = doc.querySelectorAll(".item-text > .item-alias");
-                if (textdivs.length != 0) {
-                    info.fallBack.subtitle = textdivs[0].querySelector(".text-muted").textContent.trim();;
-                    if (textdivs.length > 1) {
-                        let parts = textdivs[1].querySelectorAll(".text-muted");
+                    let textdivs = doc.querySelectorAll(".item-text > .item-alias");
+                    if (textdivs.length != 0) {
+                        info.fallBack.subtitle = textdivs[0].querySelector(".text-muted").textContent.trim();;
+                        if (textdivs.length > 1) {
+                            let parts = textdivs[1].querySelectorAll(".text-muted");
 
-                        let author = parts[0].textContent.trim();
-                        let artist = parts[1] ? parts[1].textContent.trim() : "";
+                            let author = parts[0].textContent.trim();
+                            let artist = parts[1] ? parts[1].textContent.trim() : "";
 
-                        if (author !== "") {
-                            info.authors = [{ name : author}];
+                            if (author !== "") {
+                                info.authors = [{ name : author}];
+                            }
+                            if (artist !== "") {
+                                info.artists = [{ name : artist}];
+                            }
                         }
-                        if (artist !== "") {
-                            info.artists = [{ name : artist}];
-                        }
+                    } else {
+                        console.debug("no subtitle or artist info for:");
+                        console.debug(doc);
                     }
-                } else {
-                    console.debug("no subtitle or artist info for:");
-                    console.debug(doc);
+                    let genresSpans = doc.querySelectorAll(".item-genre > span, u");
+                    for (let genreSpan of genresSpans) {
+                        info.genres.push(genreSpan.textContent.trim());
+                    }
+                    results.push(info);
+                } catch (error) {
+                    console.error('Single Manga retrieval failed - Error:', error);
                 }
-                let genresSpans = doc.querySelectorAll(".item-genre > span, u");
-                for (let genreSpan of genresSpans) {
-                    info.genres.push(genreSpan.textContent.trim());
-                }
-
-                results.push(info);
+                
             }
 
             return results;

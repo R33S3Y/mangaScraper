@@ -1,3 +1,9 @@
+# V 0.5
+ - Added mangasearch.search() ([Documentation here](API.md##Search))
+ - Readme changes
+ - Fixed a issue with page overflows in mangatoto.search()
+ - Changed parallelizeUpdateRequests to use promise.allSettled instead of promise.all
+ - Fixed issue with error handling in distributeSearchRequest and distributeUpdateRequest
 # V 0.4
  - Added the updateConfig function ([Documentation here](API.md##UpdateConfig)) to replace customizable defaults added in V0.1.4
  - Added a function to all classes called updateConfig()
