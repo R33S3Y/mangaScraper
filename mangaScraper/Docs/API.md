@@ -129,8 +129,8 @@ Here is the full list of items you can input into the item argument:
  - availableLanguages
  - displayMethod
  - views
- - rating
- - totalReviews
+ - ratings
+ - totalRatings
  - coverImage
  - coverImageExpire
  - title

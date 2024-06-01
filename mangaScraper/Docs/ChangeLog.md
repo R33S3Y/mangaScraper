@@ -1,3 +1,7 @@
+## V 0.5.1
+ - Changed the rating item to ratings
+ - Changed the totalReviews to totalRatings
+ - Added search to fetcherTemplate
 # V 0.5
  - Added mangasearch.search() ([Documentation here](API.md##Search))
  - Readme changes
