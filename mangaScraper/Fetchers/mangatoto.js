@@ -43,6 +43,9 @@ export class Mangatoto{
         if (typeof query !== 'string') {
             return null;
         }
+        if (isNaN(askRound) == true) {
+            return null;
+        }
         askRound++;
         query = query.replace(" ", "+");
 
@@ -87,9 +90,7 @@ export class Mangatoto{
             let childElements = Array.from(allResults.children);
     
             // Push each child element into the subElements array
-            childElements.forEach(function(childElement) {
-                rawResults.push(childElement);
-            });
+            rawResults.push(...childElements);
 
             if (rawResults == []) {
                 return null;

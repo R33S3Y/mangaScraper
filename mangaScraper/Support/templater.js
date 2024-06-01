@@ -29,8 +29,8 @@ export class Templater{
             availableLanguages: [],
             displayMethod: "",
             views: 0,
-            rating: 0,
-            totalReviews: 0,
+            ratings: [],
+            totalRatings: 0,
         };
 
         if (info !== null) {

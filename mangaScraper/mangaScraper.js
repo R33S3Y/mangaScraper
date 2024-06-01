@@ -175,44 +175,6 @@ export class Manga {
         // INFO
         
         this.infoSources = [];
-        /** eg: [
-         *       {source: "mangatoto",
-         *        id: 0,
-         *        link: "https://mangatoto.com/series/145319/huh-i-m-just-a-normal-girl-official", 
-         *        authors: [{name: "Hana tsukiyuki"}],
-         *        artists: [{name: "Rika fujiwara"}],
-         *        genres: ["Manga", "Josei(W)", etc],
-         *        originalLanguage: "japanese",
-         *        availableLanguages: ["english"],
-         *        displayMethod: "",
-         *        views: 840,
-         *  
-         *        ratings: None,
-         *        totalReviews: 0,
-         *  
-         *        english: {
-         *                    coverImage: "https://xfs-s118.batcg.org/thumb/W600/ampi/1c6/1c679bce242b7f87bfc26d21ccb90c0893bbe395_1055_1500_282809.jpeg?acc=ybn6ysz7iXKqzrd5YGFiLQ&exp=1703898342",
-         *                    coverImageExpire : True
-         *                    title: "Huh? I'm just a normal girl! [Official]", 
-         *                    subtitle: "えっ? 平凡ですよ?? / E? Heibon Desu yo?? / Huh? Everything Is Normal Here", 
-         *                    description: "Yukari Tachibana, a normal high school girl who lost her life in a traffic accident. Upon waking up, she found herself reincarnated as the daughter of an Earl in another world! In spite of that, the family she was born to is quite poor. In order to improve the conditions of her second life, Yukari begins to use knowledge from her previous life...?!",
-         *                    status: "Ongoing"
-         *                    totalChapters: 6,
-         *                    chapterTitles: ["Volume 1 Chapter 1", "Volume 1 Chapter 2", etc],
-         *                    chapterUploader: [{name: "Rika fujiwara"}],
-         *                    chapterLength: [26, 24, etc], // How many pictures are in a chapter
-         *                    chapterLinks: ["https://mangatoto.com/chapter/2625924", "https://mangatoto.com/chapter/2644871", etc],
-         *                    chapterLinksExpire : False
-         *                    pictureLinks: [
-         *                                     ["https://xfs-s103.batcg.org/comic/7006/119/657ec22673fc47c1f41a6911/43642984_1080_1535_426892.webp?acc=MAXx2m-8AO2lHdrUEBEtqA&exp=1703890123", "https://xfs-hd03.batcg.org/comic/7006/119/657ec22673fc47c1f41a6911/43642983_1080_1535_394896.webp?acc=7-sQFqWcnh74ndYEV2i29w&exp=1703890123", etc],
-         *                                     ["https://xfs-s105.batcg.org/comic/7006/5cb/658eb5fa32142277297e8bc5/44505463_1080_1535_293932.webp?acc=9vAjbokEV_EaOJ64N6xRUw&exp=1703890405", "https://xfs-s122.batcg.org/comic/7006/5cb/658eb5fa32142277297e8bc5/44505464_1080_1535_273214.webp?acc=f4MaX7vFrpoAOsASEm9NPA&exp=1703890405", etc], 
-         *                                     etc
-         *                                    ]
-         *                    pictureLinksExpire : True
-         *                   }
-         *       }
-         *     ]
-         */
     }
     
     updateConfig(config = {}) {
