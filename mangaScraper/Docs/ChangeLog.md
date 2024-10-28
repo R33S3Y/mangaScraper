@@ -1,3 +1,5 @@
+## V 0.5.3
+ - Fixed a bug that was causing `merger.js` to delete HTML elements
 ## V 0.5.2
  - Changed `Copyright [2024] [R33S3Y]` to `Copyright 2024 R33S3Y` in line 190 of licence
 ## V 0.5.1
