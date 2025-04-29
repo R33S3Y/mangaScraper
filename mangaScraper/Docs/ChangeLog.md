@@ -1,3 +1,5 @@
+## V 0.5.4
+ - Added some error checking to the get func
 ## V 0.5.3
  - Fixed a bug that was causing `merger.js` to delete HTML elements
 ## V 0.5.2

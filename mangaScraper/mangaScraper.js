@@ -284,6 +284,10 @@ export class Manga {
 
         //get all info
         let hold = this.infoSourceHelper.getItems(item, language, chapter, this.infoSources, fallbackLanguage, alwaysOutput, justChapter);
+
+        if (!hold.item) {
+            return "";
+        }
         
         //sort data
         let flatSourceRank = this.sourceRank.reduce((acc, curr) => {
