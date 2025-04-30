@@ -1,10 +1,10 @@
 // imports
-import { Templater } from '../Support/templater.js';
-import { InputChecker } from '../Support/inputChecker.js';
-import { ParserHelpers } from '../Support/parserHelpers.js';
-import { Merge } from '../Support/merger.js'
-import { Fetcher } from '../Support/fetcher.js';
-import { LanguageFinder } from '../Support/languageFinder.js';
+import { Templater } from '../support/templater.js';
+import { InputChecker } from '../support/inputChecker.js';
+import { ParserHelpers } from '../support/parserHelpers.js';
+import { Merge } from '../support/merger.js'
+import { Fetcher } from '../support/fetcher.js';
+import { LanguageFinder } from '../support/languageFinder.js';
 
 
 export class Mangatoto{

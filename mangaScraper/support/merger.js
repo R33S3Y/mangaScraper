@@ -7,7 +7,7 @@ export class Merge {
         return;
     }
 
-    info(oldDict, newDict) {
+    info(oldDict, newDict) { 
         /**
          * Merges two dictionaries, preserving existing values from the old dictionary.
          * @param {object} oldDict - The original dictionary.

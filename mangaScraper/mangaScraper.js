@@ -1,10 +1,10 @@
 
-import { InfoSourceHelper } from './Support/infoSourceHelper.js';
-import { Templater } from './Support/templater.js';
-import { Merge } from './Support/merger.js';
+import { InfoSourceHelper } from './support/infoSourceHelper.js';
+import { Templater } from './support/templater.js';
+import { Merge } from './support/merger.js';
 
 // fetchers
-import { Mangatoto }  from './Fetchers/mangatoto.js';
+import { Mangatoto }  from './fetchers/mangatoto.js';
 
 
 export class MangaSearch {
