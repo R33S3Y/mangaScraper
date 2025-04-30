@@ -1,13 +1,6 @@
 export class InfoSourceHelper{
-    constructor() {
-        this.config = {};
-    }
-    updateConfig(config) {
-        this.config = config;
-        return;
-    }
 
-    countItem(item, language = null, chapter = null, infoSources, calledInternally = false){
+    static countItem(item, language = null, chapter = null, infoSources, calledInternally = false){
         /**
          * Counts the occurrences of a specified item within information sources.
          * @param {string} item - The type of item to count occurrences for.
@@ -65,7 +58,7 @@ export class InfoSourceHelper{
         return vaildItems.length;
     }
 
-    getItems(item, language = null, chapter = null, infoSources, fallbackLanguage = this.config.fallbackLanguage, 
+    static getItems(item, language = null, chapter = null, infoSources, fallbackLanguage = this.config.fallbackLanguage, 
         alwaysOutput = this.config.alwaysOutput, justChapter = this.config.justChapter, calledInternally = false){
         /**
          * Retrieves items from information sources based on specified criteria.

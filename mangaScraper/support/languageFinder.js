@@ -2,8 +2,8 @@ export class LanguageFinder {
     /**
      * This support Lib is intended to help MangaScraper Have it's Languages allign with ISO 639-3
      */
-    constructor() {
-        this.mapping = {
+    getMapping() {
+        mapping = {
             "Ghotuo":"aaa",
             "Alumu-Tesu":"aab",
             "Ari":"aac",
@@ -7925,29 +7925,25 @@ export class LanguageFinder {
             "Zaza":"zza",
             "Zuojiang Zhuang":"zzj",
         }
-
-        this.config = {}
-    }
-    updateConfig(config) {
-        this.config = config
-        return
+        return mapping;
     }
 
-    nameToISO(name){
+    static nameToISO(name){
         /**
          * Converts a language name to its corresponding ISO 639-3 code.
          * @param {string} name - The name of the language.
          * @returns {string|null} - The ISO 639-3 code corresponding to the language name, or null if not found.
          */
-        return this.mapping[name];
+        return getmapping()[name];
     }
 
-    ISOToName(ISO){
+    static ISOToName(ISO){
         /**
          * Converts an ISO 639-3 code to its corresponding language name.
          * @param {string} ISO - The ISO 639-3 code.
          * @returns {string|null} - The language name corresponding to the ISO 639-3 code, or null if not found.
          */
-        return Object.keys(this.mapping).find(key => this.mapping[key] === ISO);
+        let mapping = getMapping();
+        return Object.keys(mapping).find(key => mapping[key] === ISO);
     }
 }

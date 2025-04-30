@@ -1,13 +1,6 @@
 export class InputChecker{
-    constructor() {
-        this.config = {};
-    }
-    updateConfig(config) {
-        this.config = config;
-        return;
-    }
 
-    infoInputCheck(info, source){
+    static infoInputCheck(info, source){
         /**
          * Performs input checks most likely needed for the info function.
          * @param {object} info - The input object for the info function.
@@ -15,7 +8,7 @@ export class InputChecker{
          * @returns {boolean} - False if input fails checks; otherwise, true.
          * 
          * @example
-         * if (!this.inputChecker.infoInputCheck(info, this.source)) {
+         * if (!InputChecker.infoInputCheck(info, this.source)) {
          *     return null;
          * }
          */
@@ -37,7 +30,7 @@ export class InputChecker{
         return true
     }
 
-    pictureInputCheck(info, chapter, language, source){
+    static pictureInputCheck(info, chapter, language, source){
         /**
          * Performs input checks most likely needed for the picture function.
          * @param {object} info - Input object for the info function.

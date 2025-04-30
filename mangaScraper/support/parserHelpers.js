@@ -1,14 +1,7 @@
 
 export class ParserHelpers{
-    constructor() {
-        this.config = {};
-    }
-    updateConfig(config) {
-        this.config = config;
-        return;
-    }
 
-    findElementByText(elements, text) {
+    static findElementByText(elements, text) {
         /**
          * Finds an element within a collection based on its text content.
          * @param {NodeList} elements - The collection of elements to search within.
@@ -17,7 +10,7 @@ export class ParserHelpers{
          */
         return Array.from(elements).find(element => element.textContent.includes(text));
     }
-    findElementBySubtext(elements, subtext) {
+    static findElementBySubtext(elements, subtext) {
         /**
          * Finds an element within a collection based on its subtext content.
          * @param {NodeList} elements - The collection of elements to search within.
