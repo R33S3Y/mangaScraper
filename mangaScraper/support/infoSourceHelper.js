@@ -1,3 +1,5 @@
+import { Templater } from './templater.js';
+
 export class InfoSourceHelper{
 
     static countItem(item, language = null, chapter = null, infoSources, calledInternally = false){
@@ -59,7 +61,7 @@ export class InfoSourceHelper{
     }
 
     static getItems(item, language = null, chapter = null, infoSources, fallbackLanguage = this.config.fallbackLanguage, 
-        alwaysOutput = this.config.alwaysOutput, justChapter = this.config.justChapter, calledInternally = false){
+        alwaysOutput = this.config.alwaysOutput, justChapter = this.config.justChapter){
         /**
          * Retrieves items from information sources based on specified criteria.
          * @param {string} item - The type of item to retrieve.
@@ -76,74 +78,52 @@ export class InfoSourceHelper{
          * const items = getItems("exampleItem", "eng", 1, infoSourcesArray, false, true, false, false);
          * console.log(items);
          */
-
-        //gets all items
-        let itemValues = [];
-
-        for (let i = 0; i < infoSources.length; i++) {
-            if (infoSources[i].hasOwnProperty(item)) {
-                let obj = {
-                    "item": infoSources[i][item],
-                    "id": `${infoSources[i].source}-${infoSources[i].id}`
-                };
-                itemValues.push(obj);
-            } else {
-                for (let prop in infoSources[i]) {
-                    if (typeof infoSources[i][prop] === 'object' && (prop === language.toLowerCase() || (fallbackLanguage === true && prop.length > 3))) { // if statement changed in version 0.3.1
-                        let obj = {...infoSources[i][prop]};
-                        obj.id = infoSources[i].id;
-                        obj.source = infoSources[i].source
-                        itemValues = itemValues.concat(this.getItems(item, language, chapter, [obj],fallbackLanguage, alwaysOutput, justChapter, true));
-                    }
-                }
-            }
-        }
-
-        // return itemValues; 
-        // The code below verifys that the input meaning that but instead of that it could be very good 
-        // to insteed to just inforce haveing defualts
-        // Also there's an error in the for loop were the var value = "0" for some reason. Fixed! Was due to loop being 'in' instead of 'of'
-
-        if (calledInternally === true) {
-            return itemValues;
-        }
-
-        // counts only if vaild
         let vaildItems = [];
-        let needsChapter = ["pictureLinks", "chapterLength"];
-        if (needsChapter.includes(item) && justChapter === true){
-            for (let value of itemValues) {
-                if (Array.isArray(value.item)) {
-                    if (value.item[chapter] && !(Array.isArray(value.item[chapter]) && value.item[chapter].length === 0)) {
-                        let obj = {
-                            "item": value.item[chapter],
-                            "id": value.id
-                        };
-                        vaildItems.push(obj);
-                    }
-                } else {
-                    console.warn(`item is ${item} & value is not list!!! value: ${value}`);
-                }
-            }
-        } else {
-            for (let value of itemValues) {
-                if (value.item && !(Array.isArray(value.item) && value.item.length === 0)) {
-                    vaildItems.push(value);
-                }
+        for (let info of infoSources) {
+            if (item in info && info[item]) {
+                vaildItems.push({
+                    "item": info[item],
+                    "id": `${info.source}-${info.id}`
+                });
+            } else if (item in info[language] && info[language][item]) {
+                vaildItems.push({
+                    "item": info[language][item],
+                    "id": `${info.source}-${info.id}`
+                });
+            } else if (item in info[fallbackLanguage] && info[fallbackLanguage][item]) {
+                vaildItems.push({
+                    "item": info[fallbackLanguage][item],
+                    "id": `${info.source}-${info.id}`
+                });
             }
         }
+        
 
         if (vaildItems.length === 0 && alwaysOutput === true) {
-            let obj = {
-                "item": "",
-                "id": ""
-            };
-            vaildItems.push(obj);
+            let template = Templater.makeBaseTemplate(oldInfo);
+            template[language] = Templater.makeLanguageTemplate(false, false, false);
+
+            if (item in template) {
+                vaildItems.push({
+                    "item": template[item],
+                    "id": ""
+                });
+            } else if (item in template[language]) {
+                vaildItems.push({
+                    "item": template[language][item],
+                    "id": ""
+                });
+            } else {
+                vaildItems.push({
+                    "item": "",
+                    "id": ""
+                });
+            }
         }
         return vaildItems;
     }
 
-    getInfo(source, infoSources) {
+    static getInfo(source, infoSources) {
         /**
          * Retrieves information from the provided list of infoSources based on the specified source.
          * @param {string} source - The identifier for the information source.
@@ -180,7 +160,7 @@ export class InfoSourceHelper{
         return null;
     }
 
-    getInfoIndex(source, infoSources) {
+    static getInfoIndex(source, infoSources) {
         /**
          * Retrieves the index of the information source within the provided list of infoSources based on the specified source.
          * @param {string} source - The identifier for the information source.

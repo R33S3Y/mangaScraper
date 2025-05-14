@@ -41,7 +41,7 @@ export class InputChecker{
          *                    second item indicates if calling the info function can fix the issue (true), otherwise false.
          * 
          * @example
-         * const [checker, infoFix] = this.inputChecker.pictureInputCheck(info, chapter, language, this.source);
+         * const [checker, infoFix] = InputChecker.pictureInputCheck(info, chapter, language, this.source);
          * if (!checker) {
          *     return null;
          * }

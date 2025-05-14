@@ -9,12 +9,6 @@ import { LanguageFinder } from '../support/languageFinder.js';
 
 export class Mangatoto{
     constructor() {
-        this.templater = new Templater();
-        this.inputChecker = new InputChecker();
-        this.parserHelpers = new ParserHelpers();
-        this.merge = new Merge();
-        this.fetcher = new Fetcher();
-        this.languageFinder = new LanguageFinder();
         
         this.source = "mangatoto";
 
@@ -29,12 +23,6 @@ export class Mangatoto{
 
         this.config = config;
 
-        this.templater.updateConfig(config);
-        this.inputChecker.updateConfig(config);
-        this.parserHelpers.updateConfig(config);
-        this.merge.updateConfig(config);
-        this.fetcher.updateConfig(config);
-        this.languageFinder.updateConfig(config);
         return;
     }
 
@@ -57,7 +45,7 @@ export class Mangatoto{
 
         try {
             let link = `https://mangatoto.com/search?word=${query}&page=${askRound}`
-            let html = await this.fetcher.site(link);
+            let html = await Fetcher.site(link);
             
             if (html == null) {
                 return null;                
@@ -102,8 +90,8 @@ export class Mangatoto{
                     
                     // make template
                     let info;
-                    info = this.templater.makeBaseTemplate();
-                    info.fallBack = this.templater.makeLanguageTemplate();
+                    info = Templater.makeBaseTemplate();
+                    info.fallBack = Templater.makeLanguageTemplate();
 
                     // source
                     info.source = this.source;
@@ -163,26 +151,26 @@ export class Mangatoto{
 
     async info(info){
         // Checking For Invalid input
-        if (this.inputChecker.infoInputCheck(info, this.source) !== true) {
+        if (InputChecker.infoInputCheck(info, this.source) !== true) {
             return null;
         }
 
         // Make template
-        const newInfo = this.templater.makeBaseTemplate(info);
+        const newInfo = Templater.makeBaseTemplate(info);
 
         try {
             // Get website
-            const doc = await this.fetcher.site(info.link);
+            const doc = await Fetcher.site(info.link);
 
             // Figure out what language the manga is in.
             let language;
             let languageElement;
             try {
-                languageElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Translated language:');
+                languageElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Translated language:');
                 language = languageElement ? languageElement.nextElementSibling.textContent.trim() : null;
             } catch {
                 try {
-                    languageElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Original language:');
+                    languageElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Original language:');
                     language = languageElement ? languageElement.nextElementSibling.textContent.trim() : null;
                 } catch {
                     console.error(`Can't find language info at ${info.link}`);
@@ -191,7 +179,7 @@ export class Mangatoto{
             }
 
             // Convert to ISO 639-3
-            language = this.languageFinder.nameToISO(language);
+            language = LanguageFinder.nameToISO(language);
 
             // Check that language is not in the newInfo template
             for (const key in newInfo) {
@@ -201,14 +189,14 @@ export class Mangatoto{
                 }
             }
 
-            newInfo[language] = this.templater.makeLanguageTemplate(false, false, false);
+            newInfo[language] = Templater.makeLanguageTemplate(false, false, false);
 
             
             newInfo.id = newInfo.link.match(/\/series\/(\d+)\//)[1];
 
             try {
                 // Get authors info
-                const authorsElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Authors:');
+                const authorsElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Authors:');
                 const authors = authorsElement ? authorsElement.nextElementSibling.querySelectorAll('a') : null;
                 newInfo.authors = Array.from(authors).map(item => ({ name: item.textContent }));
             } catch (error) {
@@ -218,7 +206,7 @@ export class Mangatoto{
 
             try {
                 // Get artists info
-                const artistsElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Artists:');
+                const artistsElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Artists:');
                 const artists = artistsElement ? artistsElement.nextElementSibling.querySelectorAll('a') : null;
                 newInfo.artists = Array.from(artists).map(item => ({ name: item.textContent }));
             } catch (error) {
@@ -228,7 +216,7 @@ export class Mangatoto{
             
             try {
                 // Get genres info
-                const genresElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Genres:');
+                const genresElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Genres:');
                 const genres = genresElement ? genresElement.nextElementSibling.querySelectorAll(['span','u']) : null;
             
                 newInfo.genres = Array.from(genres).map(item => (item.textContent));
@@ -239,7 +227,7 @@ export class Mangatoto{
             
             try {
                 // Get originalLanguage info
-                const originalLanguageElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Original language:');
+                const originalLanguageElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Original language:');
                 const originalLanguage = originalLanguageElement ? originalLanguageElement.nextElementSibling.textContent.trim() : null;
             
                 newInfo.originalLanguage = originalLanguage;
@@ -250,7 +238,7 @@ export class Mangatoto{
             
             try {
                 // Get availableLanguages info
-                const availableLanguageElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Translated language:');
+                const availableLanguageElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Translated language:');
                 const availableLanguage = availableLanguageElement ? availableLanguageElement.nextElementSibling.textContent.trim() : null;
             
                 newInfo.availableLanguages.push(availableLanguage);
@@ -261,7 +249,7 @@ export class Mangatoto{
             
             try {
                 // Get views info
-                const viewsElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Rank:');
+                const viewsElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Rank:');
                 const viewsText = viewsElement ? viewsElement.nextElementSibling.textContent.trim() : null;
             
                 // Use regular expressions to find the total views
@@ -328,7 +316,7 @@ export class Mangatoto{
             
             try {
                 // Get status info
-                const statusElement = this.parserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Upload status:');
+                const statusElement = ParserHelpers.findElementByText(doc.querySelectorAll('b.text-muted'), 'Upload status:');
                 const status = statusElement ? statusElement.nextElementSibling.textContent.trim() : null;
             
                 newInfo[language].status = status;
@@ -360,8 +348,7 @@ export class Mangatoto{
                 // Function is still useful if chapters info can't be found
             }
             
-            let mergedInfo = this.merge.info(info, newInfo);
-            console.debug(mergedInfo);
+            let mergedInfo = Merge.dicts(info, newInfo);
             return mergedInfo;
         } catch (error) {
             console.error('Error:', error);
@@ -371,14 +358,21 @@ export class Mangatoto{
 
     async picture(info, chapter, language){
         // Checking For Invalid input
-        let [checker, infoFix]  = this.inputChecker.pictureInputCheck(info, chapter, language, this.source);
+        let [checker, infoFix]  = InputChecker.pictureInputCheck(info, chapter, language, this.source);
         if (checker !== true) {
-            if (infoFix == true){
+            if (infoFix === true){
+                console.warn("mangatoto: attempting to get chapterLinks with an info call");
                 let newInfo = await this.info(info);
                 if (newInfo == null) {
                     return null;
                 } else {
-                    info = this.merge.info(info,newInfo);
+                    info = Merge.dicts(info,newInfo);
+                    let result = InputChecker.pictureInputCheck(info, chapter, language, this.source);
+                    if (result[0] !== true || result[1] !== false) {
+                        console.log("mangatoto: attempt failed");
+                        return null;
+                    }
+                    console.log("mangatoto: attempt successful");
                 }
             } else {
                 return null;
@@ -387,17 +381,17 @@ export class Mangatoto{
         }
 
         // Make template
-        const newInfo = this.templater.makeBaseTemplate(info);
-        newInfo[language] = this.templater.makeLanguageTemplate(false, false, false);
+        const newInfo = Templater.makeBaseTemplate(info);
+        newInfo[language] = Templater.makeLanguageTemplate(false, false, false);
 
         try {
             // Get website
-            const doc = await this.fetcher.site(info[language].chapterLinks[chapter]);
+            const doc = await Fetcher.site(info[language].chapterLinks[chapter]);
 
 
             try {
                 // Get picture info
-                const pictureInfoElement = this.parserHelpers.findElementBySubtext(doc.querySelectorAll('script'), 'const your_email = ');
+                const pictureInfoElement = ParserHelpers.findElementBySubtext(doc.querySelectorAll('script'), 'const your_email = ');
                 const pictureInfo = pictureInfoElement ? pictureInfoElement.textContent.trim() : null;
 
                 // Define a regular expression to match specific variables
@@ -418,21 +412,14 @@ export class Mangatoto{
                     }
                 }
                 
-                let imgLinks = [];
-
-                for (const index in imgHttps){
-                    imgLinks.push(imgHttps[index]);
-                }
-                
-                newInfo[language].pictureLinks[chapter] = imgLinks;
-                newInfo[language].chapterLength[chapter] = imgLinks.length;
+                newInfo[language].pictureLinks[chapter] = imgHttps;
+                newInfo[language].chapterLength[chapter] = imgHttps.length;
 
             } catch (error) {
                 console.warn(`Can't find pictureInfo info at ${info[language].chapterLinks[chapter]} ERROR: ${error}`);
             }
 
-            let mergedInfo = this.merge.info(info, newInfo);
-            console.debug(mergedInfo);
+            let mergedInfo = Merge.dicts(info, newInfo);
             return mergedInfo;
         } catch (error) {
             console.error('Error:', error);

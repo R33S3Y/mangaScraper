@@ -9,7 +9,6 @@ import { Mangatoto }  from './fetchers/mangatoto.js';
 
 export class MangaSearch {
     constructor() {
-        this.merge = new Merge();
         this.requesthandler = new RequestHandler();
 
         // Default configuration
@@ -28,11 +27,10 @@ export class MangaSearch {
 
     // Method to update the configuration
     updateConfig(config = {}) {
-        config = this.merge.info(this.config, config);
+        config = Merge.dicts(this.config, config);
 
         this.config = config;
         
-        this.merge.updateConfig(config);
         this.requesthandler.updateConfig(config);
         return;
     }
@@ -144,10 +142,7 @@ export class MangaSearch {
 
 export class Manga {
     constructor() {
-        this.infoSourceHelper = new InfoSourceHelper();
         this.requesthandler = new RequestHandler();
-        this.templater = new Templater();
-        this.merge = new Merge();
 
         this.sourceRank = []; 
         
@@ -178,14 +173,11 @@ export class Manga {
     }
     
     updateConfig(config = {}) {
-        config = this.merge.info(this.config, config);
+        config = Merge.dicts(this.config, config);
 
         this.config = config;
 
-        this.infoSourceHelper.updateConfig(config);
         this.requesthandler.updateConfig(config);
-        this.templater.updateConfig(config);
-        this.merge.updateConfig(config);
         return;
     }
 
@@ -217,7 +209,7 @@ export class Manga {
             /**
              * If the following check has failed this means that there is none of that info locally and we need to do a network request
              */
-            if (this.infoSourceHelper.countItem(item, language, chapter, this.infoSources) == 0){
+            if (InfoSourceHelper.countItem(item, language, chapter, this.infoSources) == 0){
 
                 /**
                  * The following code attempts to use the genric ranking from "this.metaInfo.request.info" (Yes I know I amazing at naming things!! :3 ) 
@@ -255,7 +247,7 @@ export class Manga {
                     let parallelRequestsOut = await this.requesthandler.parallelizeUpdateRequests(item, language, chapter, requestGroup, this.infoSources);
                     if (parallelRequestsOut !== null) {
                         this.infoSources = parallelRequestsOut;
-                        if (this.infoSourceHelper.countItem(item, language, chapter, this.infoSources) !== 0) {
+                        if (InfoSourceHelper.countItem(item, language, chapter, this.infoSources) !== 0) {
                             break;
                         }
                     }
@@ -283,11 +275,7 @@ export class Manga {
          */
 
         //get all info
-        let hold = this.infoSourceHelper.getItems(item, language, chapter, this.infoSources, fallbackLanguage, alwaysOutput, justChapter);
-
-        if (!hold.item) {
-            return "";
-        }
+        let hold = InfoSourceHelper.getItems(item, language, chapter, this.infoSources, fallbackLanguage, alwaysOutput, justChapter);
         
         //sort data
         let flatSourceRank = this.sourceRank.reduce((acc, curr) => {
@@ -331,7 +319,7 @@ export class Manga {
         let oldInfo;
 
         // getold info
-        oldInfo = this.infoSourceHelper.getInfo(source, this.infoSources);
+        oldInfo = InfoSourceHelper.getInfo(source, this.infoSources);
 
         let rawID = 0;
         let rawSource = "";
@@ -352,14 +340,14 @@ export class Manga {
             }
         } 
 
-        newInfo = this.templater.makeBaseTemplate(oldInfo);
-        newInfo[language] = this.templater.makeLanguageTemplate(false, false, false);
+        newInfo = Templater.makeBaseTemplate(oldInfo);
+        newInfo[language] = Templater.makeLanguageTemplate(false, false, false);
 
 
         // get index
-        let i = this.infoSourceHelper.getInfoIndex(source, this.infoSources);
+        let i = InfoSourceHelper.getInfoIndex(source, this.infoSources);
 
-        let mergedinfo = this.merge.info(oldInfo, newInfo);
+        let mergedinfo = Merge.dicts(oldInfo, newInfo);
 
         if (i == null) {
             //source is new
@@ -375,8 +363,6 @@ export class Manga {
 
 class RequestHandler{
     constructor() {
-        // Support
-        this.infoSourceHelper = new InfoSourceHelper();
         // Fetchers
         this.mangatoto = new Mangatoto();
 
@@ -400,7 +386,6 @@ class RequestHandler{
 
             let requestItem = [];
             while(rank.length !== 0){
-
                 if (requestItem.length >= this.config.maxParallelRequests) {
                     requestOrder.push(requestItem);
                     requestItem = [];
@@ -474,7 +459,7 @@ class RequestHandler{
             // Create a promise for each request
             const requestPromise = new Promise((resolve, reject) => {
                 // Make the request
-                let info = this.infoSourceHelper.getInfo(requestGroup[i], infoSources);
+                let info = InfoSourceHelper.getInfo(requestGroup[i], infoSources);
                 this.distributeUpdateRequest(item, language, chapter, requestGroup[i], info)
                     .then(response => {
                         resolvedRequests.push(requestGroup[i]);
@@ -502,9 +487,9 @@ class RequestHandler{
 
             // Filters out any requsts with error
             for (let source of resolvedRequests) {
-                let info = this.infoSourceHelper.getInfo(source, responses);
-                let i = this.infoSourceHelper.getInfoIndex(source, infoSources);
-                infoSources[i] = info;
+                let info = InfoSourceHelper.getInfo(source, responses);
+                let i = InfoSourceHelper.getInfoIndex(source, infoSources);
+                infoSources[i] = Merge.dicts(infoSources[i], info);
             }
             return infoSources;
             
