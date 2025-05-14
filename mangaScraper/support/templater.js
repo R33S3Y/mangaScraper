@@ -1,21 +1,14 @@
 
 export class Templater{
-    constructor() {
-        this.config = {};
-    }
-    updateConfig(config) {
-        this.config = config;
-        return;
-    }
 
-    makeBaseTemplate(info = null){
+    static makeBaseTemplate(info = null){
         /**
          * Makes the base template for manga information.
          * @param {object|null} info - The information input provided by mangaScraper (optional).
          * @returns {object} - The base template for manga information.
          * 
          * @example
-         * const newInfo = this.templater.makeBaseTemplate(info);
+         * const newInfo = Tmplater.makeBaseTemplate(info);
          */
 
         const template = {
@@ -41,7 +34,7 @@ export class Templater{
         return template
     }
 
-    makeLanguageTemplate(coverImageExpire = true, chapterLinksExpire = true, pictureLinksExpire = true){
+    static makeLanguageTemplate(coverImageExpire = true, chapterLinksExpire = true, pictureLinksExpire = true){
         /**
          * Makes a sub-template for manga information in a specific language.
          * @param {boolean} coverImageExpire - Indicates whether the cover image expires (defaults to true).
@@ -50,7 +43,7 @@ export class Templater{
          * @returns {object} - The sub-template for manga information in a specific language.
          * 
          * @example
-         * newInfo[language] = this.templater.makeLanguageTemplate(true, false);
+         * newInfo[language] = Templater.makeLanguageTemplate(true, false);
          */
         const template = {
             coverImage: "",

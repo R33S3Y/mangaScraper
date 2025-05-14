@@ -9,13 +9,6 @@ import { LanguageFinder } from "../Support/languageFinder.js";
 
 export class Example{ // Add classname
     constructor() {
-        // Declare dependances
-        this.templater = new Templater();
-        this.inputChecker = new InputChecker();
-        this.parserHelpers = new ParserHelpers();
-        this.merge = new Merge();
-        this.fetcher = new Fetcher();
-        this.languageFinder = new LanguageFinder();
         
         // State source
         this.source = "Example";
@@ -29,13 +22,7 @@ export class Example{ // Add classname
 
         this.config = config;
 
-        // Call all dependances updateConfig function here
-        this.templater.updateConfig(config);
-        this.inputChecker.updateConfig(config);
-        this.parserHelpers.updateConfig(config);
-        this.merge.updateConfig(config);
-        this.fetcher.updateConfig(config);
-        this.languageFinder.updateConfig(config);
+        
 
 
         return;
@@ -68,7 +55,7 @@ export class Example{ // Add classname
 
             // get website
             let link = `https://example.com/search?word=${query}&page=${askRound}`
-            let html = await this.fetcher.site(link);
+            let html = await Fetcher.site(link);
             
             if (html == null) {
                 return null;                
@@ -92,13 +79,13 @@ export class Example{ // Add classname
                     /** 
                      * language should alline with ISO 639-3 (you can use languageFinder.nameToISO() to help with this)
                      * If you can't find the language you can set it to fallback
-                     * Eg: info.fallback = this.templater.makeLanguageTemplate();
+                     * Eg: info.fallback = Templater.makeLanguageTemplate();
                     */
 
 
                     let info;
-                    info = this.templater.makeBaseTemplate();
-                    info[language] = this.templater.makeLanguageTemplate(); 
+                    info = Templater.makeBaseTemplate();
+                    info[language] = Templater.makeLanguageTemplate(); 
                     
 
                     
@@ -181,16 +168,16 @@ export class Example{ // Add classname
 
     async info(info){
         // Checking For Invalid input
-        if (this.inputChecker.infoInputCheck(info, this.source) !== true) {
+        if (InputChecker.infoInputCheck(info, this.source) !== true) {
             return null;
         }
 
         // Make template
-        const newInfo = this.templater.makeBaseTemplate(info);
+        const newInfo = Templater.makeBaseTemplate(info);
 
         try {
             // Get website
-            const doc = await this.fetcher.site(info.link);
+            const doc = await Fetcher.site(info.link);
 
             // Figure out what language the manga is in.
             let language = "example"; // Add your implementation here
@@ -211,7 +198,7 @@ export class Example{ // Add classname
                 }
             }
 
-            newInfo[language] = this.templater.makeLanguageTemplate(false, false, false); // Configure these
+            newInfo[language] = Templater.makeLanguageTemplate(false, false, false); // Configure these
 
             // Get ID            
             newInfo.id = 0 
@@ -353,7 +340,7 @@ export class Example{ // Add classname
             }
             
             console.debug(newInfo);
-            return this.merge.info(info, newInfo);
+            return Merge.dicts(info, newInfo);
         } catch (error) {
             console.error('Error:', error);
             return null;
@@ -362,14 +349,14 @@ export class Example{ // Add classname
 
     async picture(info, chapter, language){
         // Checking For Invalid input
-        let [checker, infoFix]  = this.inputChecker.pictureInputCheck(info, chapter, language, this.source);
+        let [checker, infoFix]  = InputChecker.pictureInputCheck(info, chapter, language, this.source);
         if (checker !== true) {
             if (infoFix == true){
                 let newInfo = await this.info(info);
                 if (newInfo == null) {
                     return null;
                 } else {
-                    info = this.merge.info(info,newInfo);
+                    info = Merge.dicts(info,newInfo);
                 }
             } else {
                 return null;
@@ -378,12 +365,12 @@ export class Example{ // Add classname
         }
 
         // Make template
-        const newInfo = this.templater.makeBaseTemplate(info);
-        newInfo[language] = this.templater.makeLanguageTemplate(false, false, false);
+        const newInfo = Templater.makeBaseTemplate(info);
+        newInfo[language] = Templater.makeLanguageTemplate(false, false, false);
 
         try {
             // Get website
-            const doc = await this.fetcher.site(info[language].chapterLinks[chapter]);
+            const doc = await Fetcher.site(info[language].chapterLinks[chapter]);
             
             try {
                 // Get picture info
@@ -398,7 +385,7 @@ export class Example{ // Add classname
 
 
             console.debug(newInfo);
-            return this.merge.info(info, newInfo);
+            return Merge.dicts(info, newInfo);
         } catch (error) {
             console.error('Error:', error);
             return null;

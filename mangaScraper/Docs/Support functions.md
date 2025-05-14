@@ -123,7 +123,7 @@ Performs input checks most likely needed for the info function.
 
 ### Example:
 ```
-if (!this.inputChecker.infoInputCheck(info, this.source)) {
+if (!InputChecker.infoInputCheck(info, this.source)) {
     return null;
 }
 ```
@@ -143,7 +143,7 @@ Performs input checks most likely needed for the picture function.
 
 ### Example:
 ```
-const [checker, infoFix] = this.inputChecker.pictureInputCheck(info, chapter, language, this.source);
+const [checker, infoFix] = InputChecker.pictureInputCheck(info, chapter, language, this.source);
 if (!checker) {
     return null;
 }

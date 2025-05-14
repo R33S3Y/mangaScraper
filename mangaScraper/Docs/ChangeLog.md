@@ -1,3 +1,9 @@
+# V 0.6
+- Fixed a bug in `merger.js` that was causing nested dicts to be improperly merged
+- Fixed bugs in the `update` function
+- Updated support functions to be static
+- Rewrote `getItems`
+- Updated folder names
 ## V 0.5.4
  - Added some error checking to the get func
 ## V 0.5.3

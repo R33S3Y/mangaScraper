@@ -1,14 +1,6 @@
 
 export class Fetcher {
-    constructor() {
-        this.config = {};
-    }
-    updateConfig(config) {
-        this.config = config;
-        return;
-    }
-
-    async site(link) {
+    static async site(link) {
         /**
          * Fetches the content of a website and returns the parsed HTML document, or null if failed.
          * @param {string} link - The URL of the website to fetch.

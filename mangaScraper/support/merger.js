@@ -1,13 +1,5 @@
 export class Merge {
-    constructor() {
-        this.config = {};
-    }
-    updateConfig(config) {
-        this.config = config;
-        return;
-    }
-
-    info(oldDict, newDict) {
+    static dicts(oldDict, newDict, defaults = [0, "", [], false, null]) {
         /**
          * Merges two dictionaries, preserving existing values from the old dictionary.
          * @param {object} oldDict - The original dictionary.
@@ -15,7 +7,6 @@ export class Merge {
          * @returns {object} - The merged dictionary.
          */
         // Helper function to recursively merge dictionaries
-        let defaults = [0, "", [], false, null];
         function mergeRecursive(oldObj, newObj) {
             /**
              * Helper function to recursively merge dictionaries.
@@ -25,7 +16,7 @@ export class Merge {
              */
             for (let key in newObj) {
                 if (newObj.hasOwnProperty(key)) {
-                    if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key]) && !newObj[key] instanceof HTMLElement) {
+                    if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key]) && !(newObj[key] instanceof HTMLElement)) {
                         // If the value is an object (but not an array), recursively merge
                         oldObj[key] = mergeRecursive(oldObj[key] || {}, newObj[key]);
                     } else if (defaults.includes(newObj[key])) {
