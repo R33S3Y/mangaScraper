@@ -193,13 +193,11 @@ export class Manga {
          */
 
         // Check that items is vaild
-        let standaloneOutput = false;
         if (Array.isArray(items) == false) {
             if (typeof items !== "string") {
                 console.error("Invalid input: Manga.request() needs items to be list or string");
                 return null;
             }
-            standaloneOutput = true;
             items = [items];
         }
         // add check that sourceRank is array
@@ -209,7 +207,7 @@ export class Manga {
             /**
              * If the following check has failed this means that there is none of that info locally and we need to do a network request
              */
-            if (InfoSourceHelper.countItem(item, language, chapter, this.infoSources) == 0){
+            if (InfoSourceHelper.countItem(item, language, chapter, this.infoSources) === 0){
 
                 /**
                  * The following code attempts to use the genric ranking from "this.metaInfo.request.info" (Yes I know I amazing at naming things!! :3 ) 
@@ -244,9 +242,20 @@ export class Manga {
 
                 //Make request
                 for (let requestGroup of requestOrder) {
-                    let parallelRequestsOut = await this.requesthandler.parallelizeUpdateRequests(item, language, chapter, requestGroup, this.infoSources);
+                    let parallelRequestsOut = await this.requesthandler.parallelizeUpdateRequests(item, language, chapter, requestGroup, JSON.parse(JSON.stringify(this.infoSources)));
                     if (parallelRequestsOut !== null) {
-                        this.infoSources = parallelRequestsOut;
+                        for (let requestInfo of parallelRequestsOut) {
+                            for (let i = 0; i < this.infoSources.length; i++) {
+                                let info = this.infoSources[i];        
+                                
+                                if (requestInfo.source !== info.source) {
+                                    continue;
+                                }
+                                this.infoSources[i] = Merge.dicts(info, requestInfo);
+                                break;
+                            
+                            }
+                        }
                         if (InfoSourceHelper.countItem(item, language, chapter, this.infoSources) !== 0) {
                             break;
                         }

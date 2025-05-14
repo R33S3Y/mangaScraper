@@ -16,7 +16,7 @@ export class Merge {
              */
             for (let key in newObj) {
                 if (newObj.hasOwnProperty(key)) {
-                    if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key]) && !newObj[key] instanceof HTMLElement) {
+                    if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key]) && !(newObj[key] instanceof HTMLElement)) {
                         // If the value is an object (but not an array), recursively merge
                         oldObj[key] = mergeRecursive(oldObj[key] || {}, newObj[key]);
                     } else if (defaults.includes(newObj[key])) {
