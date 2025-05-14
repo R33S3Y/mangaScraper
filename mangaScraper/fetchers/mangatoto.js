@@ -91,7 +91,7 @@ export class Mangatoto{
                     // make template
                     let info;
                     info = Templater.makeBaseTemplate();
-                    info.fallBack = Templater.makeLanguageTemplate();
+                    info.fallback = Templater.makeLanguageTemplate();
 
                     // source
                     info.source = this.source;
@@ -108,12 +108,12 @@ export class Mangatoto{
                     
 
                     // nice to have
-                    info.fallBack.title = doc.querySelector(".item-title").textContent.trim();
-                    info.fallBack.coverImage = img.src;
+                    info.fallback.title = doc.querySelector(".item-title").textContent.trim();
+                    info.fallback.coverImage = img.src;
 
                     let textdivs = doc.querySelectorAll(".item-text > .item-alias");
                     if (textdivs.length != 0) {
-                        info.fallBack.subtitle = textdivs[0].querySelector(".text-muted").textContent.trim();;
+                        info.fallback.subtitle = textdivs[0].querySelector(".text-muted").textContent.trim();;
                         if (textdivs.length > 1) {
                             let parts = textdivs[1].querySelectorAll(".text-muted");
 

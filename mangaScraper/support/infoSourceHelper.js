@@ -85,14 +85,13 @@ export class InfoSourceHelper{
                     "item": info[item],
                     "id": `${info.source}-${info.id}`
                 });
-            } else if (item in info[language] && info[language][item]) {
+                continue;
+            } 
+            let langInfo = info[language] || (fallbackLanguage ? info.fallback : null);
+            if (langInfo && item in langInfo && langInfo[item]) {
+                if ((item === "chapterLength" || item === "pictureLinks") && !langInfo[item][chapter]) continue;
                 vaildItems.push({
-                    "item": info[language][item],
-                    "id": `${info.source}-${info.id}`
-                });
-            } else if (item in info[fallbackLanguage] && info[fallbackLanguage][item]) {
-                vaildItems.push({
-                    "item": info[fallbackLanguage][item],
+                    "item": langInfo[item],
                     "id": `${info.source}-${info.id}`
                 });
             }
