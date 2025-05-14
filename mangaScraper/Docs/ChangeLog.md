@@ -1,3 +1,7 @@
+## V 0.6.1
+- Added support for the fallback language back to `getItems`
+- Added per chapter valid checks back to `getItems`
+- Renamed the `fallBack` info key to `fallback`
 # V 0.6
 - Fixed a bug in `merger.js` that was causing nested dicts to be improperly merged
 - Fixed bugs in the `update` function
