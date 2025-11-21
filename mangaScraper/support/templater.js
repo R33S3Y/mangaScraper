@@ -8,7 +8,7 @@ export class Templater{
          * @returns {object} - The base template for manga information.
          * 
          * @example
-         * const newInfo = Tmplater.makeBaseTemplate(info);
+         * const newInfo = Templater.makeBaseTemplate(info);
          */
 
         const template = {

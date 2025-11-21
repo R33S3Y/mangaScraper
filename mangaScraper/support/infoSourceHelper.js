@@ -99,7 +99,7 @@ export class InfoSourceHelper{
         
 
         if (vaildItems.length === 0 && alwaysOutput === true) {
-            let template = Templater.makeBaseTemplate(oldInfo);
+            let template = Templater.makeBaseTemplate();
             template[language] = Templater.makeLanguageTemplate(false, false, false);
 
             if (item in template) {

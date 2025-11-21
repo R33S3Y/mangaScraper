@@ -1,3 +1,5 @@
+### V 0.6.1.1
+ - Fixed bugs in the get `getItems` function
 ## V 0.6.1
 - Added support for the fallback language back to `getItems`
 - Added per chapter valid checks back to `getItems`

@@ -290,6 +290,8 @@ export class Manga {
         let flatSourceRank = this.sourceRank.reduce((acc, curr) => {
             return acc.concat(curr);
         }, []);
+        flatSourceRank.push(""); // this is needed in case getItems is forced to output and no item is found
+        
         let reorderedData = flatSourceRank.map(id => {
             return hold.find(item => item.id === id);
         });
